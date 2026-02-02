@@ -146,8 +146,16 @@
   "summary": {
     "title": "AI Summary",
     "generate": "Genera Summary",
-    "regenerate": "Rigenera",
+    "regenerate": "Aggiorna",
+    "generated": "Generato",
     "generating": "Generazione...",
-    "description": "Clicca per generare un riassunto AI dei feedback con i temi principali e azioni suggerite."
+    "description": "Clicca per generare un riassunto AI dei feedback con i temi principali e azioni suggerite.",
+    "upToDate": "Aggiornato",
+    "newFeedback": "Nuovi feedback"
+  },
+  "leaderboard": {
+    "title": "Top Feedback",
+    "points": "punti",
+    "scoring": "Punteggio"
   }
 }

@@ -1,21 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
+import { Entry } from '@/lib/supabase'
 
 interface AISummaryProps {
   retroId: string
-  hasEntries: boolean
+  entries: Entry[]
 }
 
-export default function AISummary({ retroId, hasEntries }: AISummaryProps) {
+export default function AISummary({ retroId, entries }: AISummaryProps) {
   const t = useTranslations()
   const locale = useLocale()
   const [summary, setSummary] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lastEntriesHash, setLastEntriesHash] = useState<string | null>(null)
+
+  // Create a hash of entries to detect changes
+  const entriesHash = useMemo(() => {
+    const content = entries
+      .map(e => `${e.category}:${e.content}`)
+      .sort()
+      .join('|')
+    return btoa(content).slice(0, 32)
+  }, [entries])
+
+  const hasNewFeedback = lastEntriesHash !== entriesHash
+  const canGenerate = entries.length > 0 && (hasNewFeedback || !summary)
 
   const generateSummary = async () => {
+    if (!canGenerate && summary) {
+      return // Don't regenerate if nothing changed
+    }
+
     setLoading(true)
     setError(null)
 
@@ -33,6 +51,7 @@ export default function AISummary({ retroId, hasEntries }: AISummaryProps) {
       }
 
       setSummary(data.summary)
+      setLastEntriesHash(entriesHash)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
@@ -40,52 +59,126 @@ export default function AISummary({ retroId, hasEntries }: AISummaryProps) {
     }
   }
 
-  if (!hasEntries) {
+  if (entries.length === 0) {
     return null
   }
 
+  // Parse summary into sections
+  const parsedSummary = useMemo(() => {
+    if (!summary) return null
+    
+    // Try to split by numbered sections or headers
+    const lines = summary.split('\n').filter(l => l.trim())
+    
+    return {
+      raw: summary,
+      lines
+    }
+  }, [summary])
+
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-8">
+    <div className="bg-gradient-to-br from-purple-900/20 to-slate-800 border border-purple-500/30 rounded-xl p-6 mb-8">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          🤖 {t('summary.title')}
+          <span className="text-2xl">🤖</span>
+          {t('summary.title')}
         </h3>
-        <button
-          onClick={generateSummary}
-          disabled={loading}
-          className="bg-purple-600 hover:bg-purple-500 disabled:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2"
-        >
-          {loading ? (
-            <>
-              <span className="animate-spin">⏳</span>
-              {t('summary.generating')}
-            </>
-          ) : summary ? (
-            <>🔄 {t('summary.regenerate')}</>
-          ) : (
-            <>✨ {t('summary.generate')}</>
+        
+        <div className="flex items-center gap-2">
+          {summary && !hasNewFeedback && (
+            <span className="text-xs text-slate-500 flex items-center gap-1">
+              ✓ {t('summary.upToDate')}
+            </span>
           )}
-        </button>
+          {summary && hasNewFeedback && (
+            <span className="text-xs text-amber-400 flex items-center gap-1">
+              ⚠ {t('summary.newFeedback')}
+            </span>
+          )}
+          
+          <button
+            onClick={generateSummary}
+            disabled={loading || (!canGenerate && !!summary)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+              loading
+                ? 'bg-slate-700 text-slate-400 cursor-wait'
+                : canGenerate || !summary
+                  ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-500/25'
+                  : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+            }`}
+          >
+            {loading ? (
+              <>
+                <span className="animate-spin">⏳</span>
+                {t('summary.generating')}
+              </>
+            ) : summary ? (
+              hasNewFeedback ? (
+                <>🔄 {t('summary.regenerate')}</>
+              ) : (
+                <>✓ {t('summary.generated')}</>
+              )
+            ) : (
+              <>✨ {t('summary.generate')}</>
+            )}
+          </button>
+        </div>
       </div>
 
       {error && (
-        <div className="text-red-400 text-sm mb-4">
-          {error}
+        <div className="bg-red-900/30 border border-red-500/30 rounded-lg p-3 mb-4">
+          <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
-      {summary && (
-        <div className="prose prose-invert max-w-none">
-          <div className="text-slate-300 whitespace-pre-wrap text-sm leading-relaxed">
-            {summary}
+      {parsedSummary ? (
+        <div className="bg-slate-900/50 rounded-lg p-5 border border-slate-700">
+          <div className="prose prose-invert prose-sm max-w-none">
+            {parsedSummary.lines.map((line, i) => {
+              // Style numbered items or headers
+              const isHeader = /^#+\s/.test(line) || /^\d+\./.test(line) || /^[•\-\*]/.test(line)
+              const isAction = line.toLowerCase().includes('action') || line.toLowerCase().includes('azione')
+              
+              if (line.startsWith('**') || line.startsWith('##')) {
+                return (
+                  <h4 key={i} className="text-emerald-400 font-semibold mt-4 mb-2 text-sm">
+                    {line.replace(/[#*]/g, '').trim()}
+                  </h4>
+                )
+              }
+              
+              if (/^\d+\./.test(line)) {
+                return (
+                  <div key={i} className={`flex gap-2 py-1 ${isAction ? 'text-amber-300' : 'text-slate-300'}`}>
+                    <span className="text-emerald-400 font-mono">{line.match(/^\d+/)?.[0]}.</span>
+                    <span>{line.replace(/^\d+\.\s*/, '')}</span>
+                  </div>
+                )
+              }
+              
+              if (/^[•\-\*]/.test(line)) {
+                return (
+                  <div key={i} className="flex gap-2 py-1 text-slate-300">
+                    <span className="text-purple-400">•</span>
+                    <span>{line.replace(/^[•\-\*]\s*/, '')}</span>
+                  </div>
+                )
+              }
+              
+              return (
+                <p key={i} className="text-slate-300 leading-relaxed py-1">
+                  {line}
+                </p>
+              )
+            })}
           </div>
         </div>
-      )}
-
-      {!summary && !loading && (
-        <p className="text-slate-500 text-sm">
-          {t('summary.description')}
-        </p>
+      ) : (
+        <div className="bg-slate-900/30 rounded-lg p-4 border border-dashed border-slate-700">
+          <p className="text-slate-500 text-sm text-center">
+            {t('summary.description')}
+          </p>
+        </div>
       )}
     </div>
   )

@@ -8,6 +8,7 @@ import { supabase, Retro, Entry, Vote, FORMATS, FormatKey } from '@/lib/supabase
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import VoteButtons from '@/components/VoteButtons'
 import AISummary from '@/components/AISummary'
+import Leaderboard from '@/components/Leaderboard'
 
 export default function DashboardPage() {
   const params = useParams()
@@ -148,6 +149,14 @@ export default function DashboardPage() {
     return votes.filter(v => v.entry_id === entryId)
   }
 
+  const handleVoteChange = (entryId: string, newVotes: Vote[]) => {
+    setVotes(prev => {
+      // Remove old votes for this entry, add new ones
+      const otherVotes = prev.filter(v => v.entry_id !== entryId)
+      return [...otherVotes, ...newVotes]
+    })
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
@@ -239,7 +248,10 @@ export default function DashboardPage() {
         )}
 
         {/* AI Summary */}
-        <AISummary retroId={retro!.id} hasEntries={entries.length > 0} />
+        <AISummary retroId={retro!.id} entries={entries} />
+
+        {/* Leaderboard */}
+        <Leaderboard entries={entries} votes={votes} />
 
         {/* Closed banner */}
         {retro!.is_closed && (
@@ -278,6 +290,7 @@ export default function DashboardPage() {
                     <VoteButtons 
                       entryId={entry.id} 
                       initialVotes={getVotesForEntry(entry.id)}
+                      onVoteChange={(newVotes) => handleVoteChange(entry.id, newVotes)}
                     />
                   </div>
                 ))

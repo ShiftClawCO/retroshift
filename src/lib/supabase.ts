@@ -80,7 +80,15 @@ export const FORMATS = {
 
 export type FormatKey = keyof typeof FORMATS
 
-export const VOTE_EMOJIS = ['👍', '🔥', '💡'] as const
+export const VOTE_EMOJIS = ['👍', '🔥', '💡', '👎'] as const
+
+// Vote scoring for leaderboard
+export const VOTE_SCORES: Record<string, number> = {
+  '👍': 1,
+  '🔥': 2,
+  '💡': 1,
+  '👎': -1,
+}
 export type VoteEmoji = typeof VOTE_EMOJIS[number]
 
 // Get or create anonymous voter ID
