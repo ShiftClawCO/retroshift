@@ -6,6 +6,7 @@ import { Entry } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Sparkles, RefreshCw, Check, Loader2, AlertCircle, Bot } from 'lucide-react'
 
 interface AISummaryProps {
   retroId: string
@@ -82,17 +83,19 @@ export default function AISummary({ retroId, entries }: AISummaryProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CardTitle className="flex items-center gap-2">
-              <span className="text-2xl">🤖</span>
+              <Bot className="w-5 h-5 text-purple-500" />
               {t('summary.title')}
             </CardTitle>
             {summary && !hasNewFeedback && (
-              <Badge variant="secondary" className="text-xs">
-                ✓ {t('summary.upToDate')}
+              <Badge variant="secondary" className="text-xs gap-1">
+                <Check className="w-3 h-3" />
+                {t('summary.upToDate')}
               </Badge>
             )}
             {summary && hasNewFeedback && (
-              <Badge variant="outline" className="text-xs border-amber-500 text-amber-500">
-                ⚠ {t('summary.newFeedback')}
+              <Badge variant="outline" className="text-xs border-amber-500 text-amber-500 gap-1">
+                <AlertCircle className="w-3 h-3" />
+                {t('summary.newFeedback')}
               </Badge>
             )}
           </div>
@@ -105,17 +108,26 @@ export default function AISummary({ retroId, entries }: AISummaryProps) {
           >
             {loading ? (
               <>
-                <span className="animate-spin mr-2">⏳</span>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 {t('summary.generating')}
               </>
             ) : summary ? (
               hasNewFeedback ? (
-                <>🔄 {t('summary.regenerate')}</>
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  {t('summary.regenerate')}
+                </>
               ) : (
-                <>✓ {t('summary.generated')}</>
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  {t('summary.generated')}
+                </>
               )
             ) : (
-              <>✨ {t('summary.generate')}</>
+              <>
+                <Sparkles className="w-4 h-4 mr-2" />
+                {t('summary.generate')}
+              </>
             )}
           </Button>
         </div>

@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Entry, Vote, VOTE_SCORES } from '@/lib/supabase'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Trophy, Medal, Award, AlertTriangle, ThumbsUp, Flame, Lightbulb, ThumbsDown } from 'lucide-react'
 
 interface LeaderboardProps {
   entries: Entry[]
@@ -52,12 +53,22 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
     return null
   }
 
-  const getMedalEmoji = (index: number) => {
+  const getMedalIcon = (index: number) => {
     switch (index) {
-      case 0: return '🥇'
-      case 1: return '🥈'
-      case 2: return '🥉'
-      default: return `#${index + 1}`
+      case 0: return <Trophy className="w-6 h-6 text-amber-500" />
+      case 1: return <Medal className="w-6 h-6 text-slate-400" />
+      case 2: return <Award className="w-6 h-6 text-amber-700" />
+      default: return <span className="w-6 h-6 flex items-center justify-center text-sm font-semibold text-muted-foreground">#{index + 1}</span>
+    }
+  }
+
+  const getVoteIcon = (emoji: string) => {
+    switch (emoji) {
+      case '👍': return <ThumbsUp className="w-3.5 h-3.5" />
+      case '🔥': return <Flame className="w-3.5 h-3.5" />
+      case '💡': return <Lightbulb className="w-3.5 h-3.5" />
+      case '👎': return <ThumbsDown className="w-3.5 h-3.5" />
+      default: return null
     }
   }
 
@@ -68,7 +79,8 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              🏆 {t('leaderboard.title')}
+              <Trophy className="w-5 h-5 text-amber-500" />
+              {t('leaderboard.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -81,7 +93,7 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
                     : 'bg-muted/50'
                 }`}
               >
-                <span className="text-2xl">{getMedalEmoji(index)}</span>
+                <div className="shrink-0 mt-0.5">{getMedalIcon(index)}</div>
                 
                 <div className="flex-1 min-w-0">
                   <p className="text-sm line-clamp-2">{item.entry.content}</p>
@@ -93,9 +105,12 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
                       +{item.score} {t('leaderboard.points')}
                     </span>
                     
-                    <div className="flex gap-1 text-xs text-muted-foreground">
+                    <div className="flex gap-2 text-xs text-muted-foreground">
                       {Object.entries(item.voteBreakdown).map(([emoji, count]) => (
-                        <span key={emoji}>{emoji}{count}</span>
+                        <span key={emoji} className="flex items-center gap-0.5">
+                          {getVoteIcon(emoji)}
+                          {count}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -111,19 +126,20 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
         <Card className="border-destructive/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              ⚠️ {t('leaderboard.controversialTitle')}
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              {t('leaderboard.controversialTitle')}
             </CardTitle>
             <CardDescription>{t('leaderboard.controversialDesc')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            {controversialEntries.map((item, index) => (
+            {controversialEntries.map((item) => (
               <div 
                 key={item.entry.id}
                 className="flex items-start gap-3 p-3 rounded-lg bg-destructive/5 border border-destructive/20"
               >
-                <span className="text-2xl">
-                  {index === 0 ? '🚨' : index === 1 ? '⚡' : '💢'}
-                </span>
+                <div className="shrink-0 mt-0.5">
+                  <AlertTriangle className="w-5 h-5 text-destructive" />
+                </div>
                 
                 <div className="flex-1 min-w-0">
                   <p className="text-sm line-clamp-2">{item.entry.content}</p>
@@ -133,9 +149,12 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
                       {item.score} {t('leaderboard.points')}
                     </span>
                     
-                    <div className="flex gap-1 text-xs text-muted-foreground">
+                    <div className="flex gap-2 text-xs text-muted-foreground">
                       {Object.entries(item.voteBreakdown).map(([emoji, count]) => (
-                        <span key={emoji}>{emoji}{count}</span>
+                        <span key={emoji} className="flex items-center gap-0.5">
+                          {getVoteIcon(emoji)}
+                          {count}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -147,9 +166,13 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
       )}
 
       {/* Scoring legend */}
-      <p className="text-xs text-muted-foreground text-center">
-        {t('leaderboard.scoring')}: 👍 +1 • 🔥 +2 • 💡 +1 • 👎 -1
-      </p>
+      <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+        <span>{t('leaderboard.scoring')}:</span>
+        <span className="flex items-center gap-1"><ThumbsUp className="w-3.5 h-3.5" /> +1</span>
+        <span className="flex items-center gap-1"><Flame className="w-3.5 h-3.5" /> +2</span>
+        <span className="flex items-center gap-1"><Lightbulb className="w-3.5 h-3.5" /> +1</span>
+        <span className="flex items-center gap-1"><ThumbsDown className="w-3.5 h-3.5" /> -1</span>
+      </div>
     </div>
   )
 }

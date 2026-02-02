@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { supabase, FORMATS, FormatKey } from '@/lib/supabase'
+import { getCategoryConfig } from '@/lib/category-icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -51,7 +52,7 @@ export default function CreateRetro() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container py-12">
+      <main className="container mx-auto px-4 py-12">
         <div className="max-w-xl mx-auto">
           <Link href="/" className="text-muted-foreground hover:text-foreground mb-8 inline-block text-sm">
             ← {t('common.backHome')}
@@ -85,18 +86,25 @@ export default function CreateRetro() {
                       <div
                         key={key}
                         onClick={() => setFormat(key)}
-                        className={`flex items-center p-4 rounded-lg border cursor-pointer transition-colors ${
+                        className={`flex items-center p-4 rounded-lg border cursor-pointer transition-all ${
                           format === key
-                            ? 'bg-primary/10 border-primary'
-                            : 'bg-card hover:border-primary/50'
+                            ? 'bg-primary/10 border-primary shadow-sm'
+                            : 'bg-card hover:border-primary/50 hover:shadow-sm'
                         }`}
                       >
-                        <div>
+                        <div className="w-full">
                           <div className="font-medium">{t(`formats.${key}.name`)}</div>
-                          <div className="text-sm text-muted-foreground mt-1">
-                            {FORMATS[key].categories.map((cat) => 
-                              t(`formats.${key}.${cat}`)
-                            ).join(' • ')}
+                          <div className="flex items-center gap-4 mt-2">
+                            {FORMATS[key].categories.map((cat) => {
+                              const config = getCategoryConfig(cat)
+                              const IconComponent = config.icon
+                              return (
+                                <div key={cat} className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                  <IconComponent className={`w-4 h-4 ${config.iconColor}`} />
+                                  <span>{t(`formats.${key}.${cat}`)}</span>
+                                </div>
+                              )
+                            })}
                           </div>
                         </div>
                       </div>
@@ -115,7 +123,7 @@ export default function CreateRetro() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

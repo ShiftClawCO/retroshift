@@ -5,10 +5,12 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { supabase, Retro, Entry, Vote, FORMATS, FormatKey } from '@/lib/supabase'
+import { getCategoryConfig } from '@/lib/category-icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Lock, LockOpen, Link2, Check, Share2 } from 'lucide-react'
 import Header from '@/components/Header'
 import VoteButtons from '@/components/VoteButtons'
 import AISummary from '@/components/AISummary'
@@ -184,26 +186,11 @@ export default function DashboardPage() {
     return acc
   }, {} as Record<string, Entry[]>)
 
-  const getCategoryStyles = (category: string) => {
-    const colorMap: Record<string, string> = {
-      start: 'border-l-green-500 bg-green-500/5',
-      stop: 'border-l-red-500 bg-red-500/5',
-      continue: 'border-l-blue-500 bg-blue-500/5',
-      mad: 'border-l-red-500 bg-red-500/5',
-      sad: 'border-l-blue-500 bg-blue-500/5',
-      glad: 'border-l-green-500 bg-green-500/5',
-      liked: 'border-l-pink-500 bg-pink-500/5',
-      learned: 'border-l-yellow-500 bg-yellow-500/5',
-      lacked: 'border-l-gray-500 bg-gray-500/5',
-    }
-    return colorMap[category] || ''
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container py-8">
+      <main className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
@@ -218,13 +205,21 @@ export default function DashboardPage() {
 
           <div className="flex gap-3">
             <Button variant="outline" onClick={copyShareLink}>
-              {copied ? t('dashboard.copied') : t('dashboard.copyLink')}
+              {copied ? (
+                <><Check className="w-4 h-4 mr-2" /> {t('dashboard.copied')}</>
+              ) : (
+                <><Link2 className="w-4 h-4 mr-2" /> {t('dashboard.copyLink')}</>
+              )}
             </Button>
             <Button
               variant={retro!.is_closed ? 'default' : 'destructive'}
               onClick={toggleClose}
             >
-              {retro!.is_closed ? t('dashboard.reopen') : t('dashboard.close')}
+              {retro!.is_closed ? (
+                <><LockOpen className="w-4 h-4 mr-2" /> {t('dashboard.reopen')}</>
+              ) : (
+                <><Lock className="w-4 h-4 mr-2" /> {t('dashboard.close')}</>
+              )}
             </Button>
           </div>
         </div>
@@ -233,7 +228,10 @@ export default function DashboardPage() {
         {entries.length === 0 && (
           <Card className="border-primary bg-primary/5 mb-8">
             <CardHeader>
-              <CardTitle className="text-lg">{t('dashboard.shareTitle')}</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Share2 className="w-5 h-5 text-primary" />
+                {t('dashboard.shareTitle')}
+              </CardTitle>
               <CardDescription>{t('dashboard.shareDesc')}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -244,7 +242,7 @@ export default function DashboardPage() {
                   className="flex-1"
                 />
                 <Button onClick={copyShareLink}>
-                  {copied ? t('dashboard.copied') : t('dashboard.copy')}
+                  {copied ? <><Check className="w-4 h-4 mr-2" /> {t('dashboard.copied')}</> : t('dashboard.copy')}
                 </Button>
               </div>
             </CardContent>
@@ -261,7 +259,7 @@ export default function DashboardPage() {
         {retro!.is_closed && (
           <Card className="border-destructive bg-destructive/5 mb-8">
             <CardContent className="flex items-center gap-2 py-4">
-              <span>🔒</span>
+              <Lock className="w-4 h-4 text-destructive" />
               <span>{t('dashboard.closedBanner')}</span>
             </CardContent>
           </Card>
@@ -269,51 +267,56 @@ export default function DashboardPage() {
 
         {/* Entries grid */}
         <div className="grid md:grid-cols-3 gap-6">
-          {format.categories.map((category) => (
-            <div key={category} className="space-y-4">
-              <Card className={`border-l-4 ${getCategoryStyles(category)}`}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">
-                    {t(`formats.${retro!.format}.${category}`)}
-                  </CardTitle>
-                  <CardDescription>
-                    {t('dashboard.responses', { count: entriesByCategory[category].length })}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-
-              {entriesByCategory[category].length === 0 ? (
-                <Card className="border-dashed">
-                  <CardContent className="py-8 text-center text-muted-foreground text-sm">
-                    {t('dashboard.noFeedback')}
-                  </CardContent>
+          {format.categories.map((category) => {
+            const config = getCategoryConfig(category)
+            const IconComponent = config.icon
+            return (
+              <div key={category} className="space-y-4">
+                <Card className={`border-l-4 ${config.border} ${config.bg}`}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-center gap-2.5">
+                      <IconComponent className={`w-5 h-5 ${config.iconColor}`} />
+                      <span>{t(`formats.${retro!.format}.${category}`)}</span>
+                    </CardTitle>
+                    <CardDescription>
+                      {t('dashboard.responses', { count: entriesByCategory[category].length })}
+                    </CardDescription>
+                  </CardHeader>
                 </Card>
-              ) : (
-                entriesByCategory[category].map((entry) => (
-                  <Card key={entry.id}>
-                    <CardContent className="pt-4">
-                      <p className="whitespace-pre-wrap">{entry.content}</p>
-                      <p className="text-muted-foreground text-xs mt-2">
-                        {new Date(entry.created_at).toLocaleString(locale === 'it' ? 'it-IT' : 'en-US')}
-                      </p>
-                      <VoteButtons 
-                        entryId={entry.id} 
-                        initialVotes={getVotesForEntry(entry.id)}
-                        onVoteChange={(newVotes) => handleVoteChange(entry.id, newVotes)}
-                      />
+
+                {entriesByCategory[category].length === 0 ? (
+                  <Card className="border-dashed">
+                    <CardContent className="py-8 text-center text-muted-foreground text-sm">
+                      {t('dashboard.noFeedback')}
                     </CardContent>
                   </Card>
-                ))
-              )}
-            </div>
-          ))}
+                ) : (
+                  entriesByCategory[category].map((entry) => (
+                    <Card key={entry.id} className="transition-all hover:shadow-md">
+                      <CardContent className="pt-4">
+                        <p className="whitespace-pre-wrap">{entry.content}</p>
+                        <p className="text-muted-foreground text-xs mt-2">
+                          {new Date(entry.created_at).toLocaleString(locale === 'it' ? 'it-IT' : 'en-US')}
+                        </p>
+                        <VoteButtons 
+                          entryId={entry.id} 
+                          initialVotes={getVotesForEntry(entry.id)}
+                          onVoteChange={(newVotes) => handleVoteChange(entry.id, newVotes)}
+                        />
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            )
+          })}
         </div>
 
         {/* Refresh hint */}
         <p className="text-center text-muted-foreground text-sm mt-8">
           {t('dashboard.autoRefresh')}
         </p>
-      </div>
+      </main>
     </div>
   )
 }

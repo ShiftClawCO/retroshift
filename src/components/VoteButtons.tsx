@@ -2,11 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import { supabase, Vote, VOTE_EMOJIS, VoteEmoji, getVoterId } from '@/lib/supabase'
+import { ThumbsUp, Flame, Lightbulb, ThumbsDown, LucideIcon } from 'lucide-react'
 
 interface VoteButtonsProps {
   entryId: string
   initialVotes: Vote[]
   onVoteChange?: (votes: Vote[]) => void
+}
+
+const VOTE_ICONS: Record<VoteEmoji, LucideIcon> = {
+  '👍': ThumbsUp,
+  '🔥': Flame,
+  '💡': Lightbulb,
+  '👎': ThumbsDown,
 }
 
 export default function VoteButtons({ entryId, initialVotes, onVoteChange }: VoteButtonsProps) {
@@ -74,8 +82,8 @@ export default function VoteButtons({ entryId, initialVotes, onVoteChange }: Vot
     setLoading(null)
   }
 
-  // Emoji styling
-  const getEmojiStyle = (emoji: VoteEmoji, voted: boolean, count: number) => {
+  // Get styling based on vote type
+  const getButtonStyle = (emoji: VoteEmoji, voted: boolean, count: number) => {
     const baseStyle = 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm transition-all duration-200 font-medium'
     
     if (voted) {
@@ -100,17 +108,19 @@ export default function VoteButtons({ entryId, initialVotes, onVoteChange }: Vot
       {VOTE_EMOJIS.map((emoji) => {
         const count = getVoteCount(emoji)
         const voted = hasVoted(emoji)
+        const IconComponent = VOTE_ICONS[emoji]
         
         return (
           <button
             key={emoji}
             onClick={() => toggleVote(emoji)}
             disabled={loading === emoji}
-            className={`${getEmojiStyle(emoji, voted, count)} ${
+            className={`${getButtonStyle(emoji, voted, count)} ${
               loading === emoji ? 'opacity-50 cursor-wait' : 'cursor-pointer'
             }`}
+            title={emoji === '👍' ? 'Good' : emoji === '🔥' ? 'Hot' : emoji === '💡' ? 'Idea' : 'Issue'}
           >
-            <span className="text-base">{emoji}</span>
+            <IconComponent className="w-4 h-4" />
             {count > 0 && (
               <span className={`text-xs ${voted ? 'text-white/90' : 'text-slate-400'}`}>
                 {count}

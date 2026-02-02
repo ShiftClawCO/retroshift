@@ -14,27 +14,27 @@
     "ctaSub": "Setup in 30 seconds. No credit card required.",
     
     "painTitle": "Sound familiar?",
-    "pain1Title": "😶 Silence on calls",
+    "pain1Title": "Silence on calls",
     "pain1Desc": "\"Anyone have anything to add?\" *crickets*",
-    "pain2Title": "🗣️ Same people every time",
+    "pain2Title": "Same people every time",
     "pain2Desc": "Two people talk, everyone else stays quiet.",
-    "pain3Title": "🎭 Watered-down feedback",
+    "pain3Title": "Watered-down feedback",
     "pain3Desc": "Nobody says what they really think.",
     
     "solutionTitle": "The solution: anonymous, async feedback",
-    "solution1Title": "🔒 Real anonymity",
+    "solution1Title": "Real anonymity",
     "solution1Desc": "Your team writes what they really think. No names, no judgment.",
-    "solution2Title": "⏰ On their time",
+    "solution2Title": "On their time",
     "solution2Desc": "No forced calls. Everyone responds when they have time to reflect.",
-    "solution3Title": "📊 All aggregated",
+    "solution3Title": "All aggregated",
     "solution3Desc": "See patterns, not personalities. Focus on real issues.",
     
     "howItWorks": "How it works",
-    "step1Title": "1. Create the retro",
+    "step1Title": "Create the retro",
     "step1Desc": "Pick a format, give it a name. 30 seconds.",
-    "step2Title": "2. Share the link",
+    "step2Title": "Share the link",
     "step2Desc": "Slack, Teams, email. Team doesn't need to sign up.",
-    "step3Title": "3. Collect feedback",
+    "step3Title": "Collect feedback",
     "step3Desc": "See responses in real-time. Anonymous and honest.",
     
     "comparisonTitle": "Why not use Miro or FunRetro?",
@@ -99,42 +99,43 @@
     "thanks": "Thank you!",
     "sent": "Your feedback has been submitted anonymously.",
     "addMore": "Add more feedback",
-    "closed": "This retro has been closed",
+    "closedTitle": "Retro Closed",
+    "closed": "This retro has ended. The team can no longer submit feedback.",
     "notFound": "Retro not found",
     "createNew": "Create a new retro"
   },
   "dashboard": {
     "feedbackCount": "{count} feedback received",
-    "copyLink": "🔗 Copy team link",
-    "copied": "✓ Copied!",
-    "close": "🔒 Close retro",
-    "reopen": "🔓 Reopen",
+    "copyLink": "Copy team link",
+    "copied": "Copied!",
+    "close": "Close retro",
+    "reopen": "Reopen",
     "closedBanner": "This retro is closed. The team can no longer add feedback.",
-    "shareTitle": "👋 Share with your team",
+    "shareTitle": "Share with your team",
     "shareDesc": "Copy this link and share it on Slack, Teams, or email. The team can respond anonymously.",
     "copy": "Copy",
     "noFeedback": "No feedback yet",
     "responses": "{count} responses",
-    "autoRefresh": "New feedback will appear automatically 🔄"
+    "autoRefresh": "New feedback will appear automatically"
   },
   "formats": {
     "start-stop-continue": {
       "name": "Start / Stop / Continue",
-      "start": "🚀 Start",
-      "stop": "🛑 Stop",
-      "continue": "✅ Continue"
+      "start": "Start",
+      "stop": "Stop",
+      "continue": "Continue"
     },
     "mad-sad-glad": {
       "name": "Mad / Sad / Glad",
-      "mad": "😠 Mad",
-      "sad": "😢 Sad",
-      "glad": "😊 Glad"
+      "mad": "Mad",
+      "sad": "Sad",
+      "glad": "Glad"
     },
     "liked-learned-lacked": {
       "name": "Liked / Learned / Lacked",
-      "liked": "❤️ Liked",
-      "learned": "💡 Learned",
-      "lacked": "🤔 Lacked"
+      "liked": "Liked",
+      "learned": "Learned",
+      "lacked": "Lacked"
     }
   },
   "notFound": {
