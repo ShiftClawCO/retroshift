@@ -3,11 +3,15 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations, useLocale } from 'next-intl'
 import { supabase, Retro, FORMATS, FormatKey } from '@/lib/supabase'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 export default function ParticipatePage() {
   const params = useParams()
   const code = params.code as string
+  const t = useTranslations()
+  const locale = useLocale()
   
   const [retro, setRetro] = useState<Retro | null>(null)
   const [loading, setLoading] = useState(true)
@@ -28,14 +32,13 @@ export default function ParticipatePage() {
       .single()
 
     if (dbError || !data) {
-      setError('Retro non trovata')
+      setError(t('participate.notFound'))
       setLoading(false)
       return
     }
 
     setRetro(data)
     
-    // Initialize entries for each category
     const format = FORMATS[data.format as FormatKey]
     const initialEntries: Record<string, string> = {}
     format.categories.forEach(cat => {
@@ -49,17 +52,15 @@ export default function ParticipatePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Check if at least one entry has content
     const hasContent = Object.values(entries).some(v => v.trim())
     if (!hasContent) {
-      setError('Scrivi almeno un feedback')
+      setError(t('participate.errorEmpty'))
       return
     }
 
     setSubmitting(true)
     setError('')
 
-    // Insert all non-empty entries
     const toInsert = Object.entries(entries)
       .filter(([_, content]) => content.trim())
       .map(([category, content]) => ({
@@ -73,7 +74,7 @@ export default function ParticipatePage() {
       .insert(toInsert)
 
     if (dbError) {
-      setError('Errore nel salvataggio. Riprova.')
+      setError(t('participate.errorGeneric'))
       setSubmitting(false)
       return
     }
@@ -84,7 +85,7 @@ export default function ParticipatePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-slate-400">Caricamento...</div>
+        <div className="text-slate-400">{t('common.loading')}</div>
       </div>
     )
   }
@@ -95,7 +96,7 @@ export default function ParticipatePage() {
         <div className="text-center">
           <div className="text-red-400 mb-4">{error}</div>
           <Link href="/" className="text-emerald-400 hover:text-emerald-300">
-            Torna alla home
+            {t('common.backHome')}
           </Link>
         </div>
       </div>
@@ -107,9 +108,9 @@ export default function ParticipatePage() {
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
         <div className="text-center">
           <div className="text-2xl mb-2">🔒</div>
-          <div className="text-slate-400 mb-4">Questa retro è stata chiusa</div>
+          <div className="text-slate-400 mb-4">{t('participate.closed')}</div>
           <Link href="/" className="text-emerald-400 hover:text-emerald-300">
-            Crea una nuova retro
+            {t('participate.createNew')}
           </Link>
         </div>
       </div>
@@ -121,8 +122,8 @@ export default function ParticipatePage() {
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">✅</div>
-          <h1 className="text-2xl font-bold text-white mb-2">Grazie!</h1>
-          <p className="text-slate-400 mb-6">Il tuo feedback è stato inviato in modo anonimo.</p>
+          <h1 className="text-2xl font-bold text-white mb-2">{t('participate.thanks')}</h1>
+          <p className="text-slate-400 mb-6">{t('participate.sent')}</p>
           <button
             onClick={() => {
               setSubmitted(false)
@@ -135,7 +136,7 @@ export default function ParticipatePage() {
             }}
             className="text-emerald-400 hover:text-emerald-300"
           >
-            Aggiungi altro feedback
+            {t('participate.addMore')}
           </button>
         </div>
       </div>
@@ -146,10 +147,14 @@ export default function ParticipatePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-12">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher currentLocale={locale} />
+      </div>
+
       <div className="max-w-2xl mx-auto px-4">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-white mb-2">{retro!.title}</h1>
-          <p className="text-slate-400">Il tuo feedback è completamente anonimo</p>
+          <p className="text-slate-400">{t('participate.anonymous')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -159,12 +164,12 @@ export default function ParticipatePage() {
               className={`p-6 rounded-lg border ${format.colors[category as keyof typeof format.colors]}`}
             >
               <label className="block text-lg font-medium text-slate-800 mb-3">
-                {format.labels[category as keyof typeof format.labels]}
+                {t(`formats.${retro!.format}.${category}`)}
               </label>
               <textarea
                 value={entries[category] || ''}
                 onChange={(e) => setEntries(prev => ({ ...prev, [category]: e.target.value }))}
-                placeholder="Scrivi qui il tuo feedback..."
+                placeholder={t('participate.placeholder')}
                 rows={3}
                 className="w-full px-4 py-3 bg-white/80 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
@@ -180,7 +185,7 @@ export default function ParticipatePage() {
             disabled={submitting}
             className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-600 text-white font-semibold px-6 py-4 rounded-lg transition-colors text-lg"
           >
-            {submitting ? 'Invio...' : 'Invia Feedback Anonimo →'}
+            {submitting ? t('participate.submitting') : t('participate.submit')}
           </button>
         </form>
 

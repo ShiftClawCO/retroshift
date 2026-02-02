@@ -3,11 +3,15 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations, useLocale } from 'next-intl'
 import { supabase, Retro, Entry, FORMATS, FormatKey } from '@/lib/supabase'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 export default function DashboardPage() {
   const params = useParams()
   const code = params.code as string
+  const t = useTranslations()
+  const locale = useLocale()
   
   const [retro, setRetro] = useState<Retro | null>(null)
   const [entries, setEntries] = useState<Entry[]>([])
@@ -16,7 +20,6 @@ export default function DashboardPage() {
   const [copied, setCopied] = useState(false)
 
   const loadData = useCallback(async () => {
-    // Load retro
     const { data: retroData, error: retroError } = await supabase
       .from('retros')
       .select('*')
@@ -24,14 +27,13 @@ export default function DashboardPage() {
       .single()
 
     if (retroError || !retroData) {
-      setError('Retro non trovata')
+      setError(t('participate.notFound'))
       setLoading(false)
-      return
+      return null
     }
 
     setRetro(retroData)
 
-    // Load entries
     const { data: entriesData } = await supabase
       .from('entries')
       .select('*')
@@ -40,33 +42,44 @@ export default function DashboardPage() {
 
     setEntries(entriesData || [])
     setLoading(false)
-  }, [code])
+    
+    return retroData
+  }, [code, t])
 
   useEffect(() => {
-    loadData()
-    
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('entries-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'entries',
-        },
-        (payload) => {
-          if (payload.new && retro && payload.new.retro_id === retro.id) {
-            setEntries(prev => [...prev, payload.new as Entry])
-          }
-        }
-      )
-      .subscribe()
+    let channel: ReturnType<typeof supabase.channel> | null = null
+
+    const setup = async () => {
+      const retroData = await loadData()
+      
+      if (retroData) {
+        // Subscribe to real-time updates
+        channel = supabase
+          .channel(`entries-${retroData.id}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'entries',
+              filter: `retro_id=eq.${retroData.id}`,
+            },
+            (payload) => {
+              setEntries(prev => [...prev, payload.new as Entry])
+            }
+          )
+          .subscribe()
+      }
+    }
+
+    setup()
 
     return () => {
-      supabase.removeChannel(channel)
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
     }
-  }, [loadData, retro?.id])
+  }, [loadData])
 
   const copyShareLink = () => {
     const url = `${window.location.origin}/r/${code}`
@@ -91,7 +104,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-slate-400">Caricamento...</div>
+        <div className="text-slate-400">{t('common.loading')}</div>
       </div>
     )
   }
@@ -102,7 +115,7 @@ export default function DashboardPage() {
         <div className="text-center">
           <div className="text-red-400 mb-4">{error}</div>
           <Link href="/" className="text-emerald-400 hover:text-emerald-300">
-            Torna alla home
+            {t('common.backHome')}
           </Link>
         </div>
       </div>
@@ -117,16 +130,20 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-8">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher currentLocale={locale} />
+      </div>
+
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <Link href="/" className="text-slate-400 hover:text-white text-sm mb-2 inline-block">
-              ← Torna alla home
+              ← {t('common.backHome')}
             </Link>
             <h1 className="text-2xl font-bold text-white">{retro!.title}</h1>
             <p className="text-slate-400 text-sm mt-1">
-              {entries.length} feedback ricevuti • {format.name}
+              {t('dashboard.feedbackCount', { count: entries.length })} • {t(`formats.${retro!.format}.name`)}
             </p>
           </div>
 
@@ -135,7 +152,7 @@ export default function DashboardPage() {
               onClick={copyShareLink}
               className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
             >
-              {copied ? '✓ Copiato!' : '🔗 Copia link per il team'}
+              {copied ? t('dashboard.copied') : t('dashboard.copyLink')}
             </button>
             <button
               onClick={toggleClose}
@@ -145,7 +162,7 @@ export default function DashboardPage() {
                   : 'bg-red-600 hover:bg-red-500 text-white'
               }`}
             >
-              {retro!.is_closed ? '🔓 Riapri' : '🔒 Chiudi retro'}
+              {retro!.is_closed ? t('dashboard.reopen') : t('dashboard.close')}
             </button>
           </div>
         </div>
@@ -153,9 +170,9 @@ export default function DashboardPage() {
         {/* Share banner */}
         {entries.length === 0 && (
           <div className="bg-emerald-900/30 border border-emerald-600 rounded-lg p-6 mb-8">
-            <h3 className="text-emerald-400 font-semibold mb-2">👋 Condividi con il team</h3>
+            <h3 className="text-emerald-400 font-semibold mb-2">{t('dashboard.shareTitle')}</h3>
             <p className="text-slate-300 text-sm mb-4">
-              Copia questo link e condividilo su Slack, Teams, o email. Il team può rispondere in modo anonimo.
+              {t('dashboard.shareDesc')}
             </p>
             <div className="flex gap-2">
               <input
@@ -168,7 +185,7 @@ export default function DashboardPage() {
                 onClick={copyShareLink}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
               >
-                {copied ? '✓ Copiato!' : 'Copia'}
+                {copied ? t('dashboard.copied') : t('dashboard.copy')}
               </button>
             </div>
           </div>
@@ -177,7 +194,7 @@ export default function DashboardPage() {
         {/* Closed banner */}
         {retro!.is_closed && (
           <div className="bg-slate-700 border border-slate-600 rounded-lg p-4 mb-8 flex items-center justify-between">
-            <span className="text-slate-300">🔒 Questa retro è chiusa. Il team non può più aggiungere feedback.</span>
+            <span className="text-slate-300">🔒 {t('dashboard.closedBanner')}</span>
           </div>
         )}
 
@@ -187,16 +204,16 @@ export default function DashboardPage() {
             <div key={category} className="space-y-4">
               <div className={`p-4 rounded-lg border ${format.colors[category as keyof typeof format.colors]}`}>
                 <h2 className="text-lg font-semibold text-slate-800">
-                  {format.labels[category as keyof typeof format.labels]}
+                  {t(`formats.${retro!.format}.${category}`)}
                 </h2>
                 <p className="text-slate-600 text-sm">
-                  {entriesByCategory[category].length} risposte
+                  {t('dashboard.responses', { count: entriesByCategory[category].length })}
                 </p>
               </div>
 
               {entriesByCategory[category].length === 0 ? (
                 <div className="text-slate-500 text-sm p-4 text-center border border-dashed border-slate-700 rounded-lg">
-                  Nessun feedback ancora
+                  {t('dashboard.noFeedback')}
                 </div>
               ) : (
                 entriesByCategory[category].map((entry) => (
@@ -206,7 +223,7 @@ export default function DashboardPage() {
                   >
                     <p className="text-slate-200 whitespace-pre-wrap">{entry.content}</p>
                     <p className="text-slate-500 text-xs mt-2">
-                      {new Date(entry.created_at).toLocaleString('it-IT')}
+                      {new Date(entry.created_at).toLocaleString(locale === 'it' ? 'it-IT' : 'en-US')}
                     </p>
                   </div>
                 ))
@@ -217,7 +234,7 @@ export default function DashboardPage() {
 
         {/* Refresh hint */}
         <p className="text-center text-slate-500 text-sm mt-8">
-          I nuovi feedback appariranno automaticamente 🔄
+          {t('dashboard.autoRefresh')}
         </p>
       </div>
     </div>

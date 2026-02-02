@@ -1,0 +1,88 @@
+{
+  "common": {
+    "backHome": "Back to home",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry"
+  },
+  "home": {
+    "title": "RetroShift",
+    "subtitle": "Anonymous, async retrospectives for your team.",
+    "subtitleHighlight": "No awkward silences. Just honest feedback.",
+    "cta": "Create a Retro →",
+    "free": "Free • No signup required",
+    "howItWorks": "How it works",
+    "step1Title": "Create the retro",
+    "step1Desc": "Pick a format and get a link to share with your team.",
+    "step2Title": "Team writes",
+    "step2Desc": "Anonymous feedback, whenever they want, no pressure.",
+    "step3Title": "See results",
+    "step3Desc": "All feedback aggregated in a clear dashboard.",
+    "formats": "Available formats",
+    "footer": "Made with 🦞 by"
+  },
+  "create": {
+    "title": "Create a new Retro",
+    "titleLabel": "Title",
+    "titlePlaceholder": "e.g. Sprint 42 - February 2026",
+    "formatLabel": "Format",
+    "submit": "Create Retro →",
+    "submitting": "Creating...",
+    "errorTitle": "Please enter a title for the retro",
+    "errorGeneric": "Error creating retro. Please try again."
+  },
+  "participate": {
+    "anonymous": "Your feedback is completely anonymous",
+    "placeholder": "Write your feedback here...",
+    "submit": "Submit Anonymous Feedback →",
+    "submitting": "Sending...",
+    "errorEmpty": "Please write at least one feedback",
+    "errorGeneric": "Error saving feedback. Please try again.",
+    "thanks": "Thank you!",
+    "sent": "Your feedback has been submitted anonymously.",
+    "addMore": "Add more feedback",
+    "closed": "This retro has been closed",
+    "notFound": "Retro not found",
+    "createNew": "Create a new retro"
+  },
+  "dashboard": {
+    "feedbackCount": "{count} feedback received",
+    "copyLink": "🔗 Copy team link",
+    "copied": "✓ Copied!",
+    "close": "🔒 Close retro",
+    "reopen": "🔓 Reopen",
+    "closedBanner": "This retro is closed. The team can no longer add feedback.",
+    "shareTitle": "👋 Share with your team",
+    "shareDesc": "Copy this link and share it on Slack, Teams, or email. The team can respond anonymously.",
+    "copy": "Copy",
+    "noFeedback": "No feedback yet",
+    "responses": "{count} responses",
+    "autoRefresh": "New feedback will appear automatically 🔄"
+  },
+  "formats": {
+    "start-stop-continue": {
+      "name": "Start / Stop / Continue",
+      "start": "🚀 Start",
+      "stop": "🛑 Stop",
+      "continue": "✅ Continue"
+    },
+    "mad-sad-glad": {
+      "name": "Mad / Sad / Glad",
+      "mad": "😠 Mad",
+      "sad": "😢 Sad",
+      "glad": "😊 Glad"
+    },
+    "liked-learned-lacked": {
+      "name": "Liked / Learned / Lacked",
+      "liked": "❤️ Liked",
+      "learned": "💡 Learned",
+      "lacked": "🤔 Lacked"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "desc": "The page you're looking for doesn't exist.",
+    "retroTitle": "Retro not found",
+    "retroDesc": "The link may have expired or is invalid."
+  }
+}

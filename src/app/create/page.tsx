@@ -3,10 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations, useLocale } from 'next-intl'
 import { supabase, FORMATS, FormatKey } from '@/lib/supabase'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 export default function CreateRetro() {
   const router = useRouter()
+  const t = useTranslations()
+  const locale = useLocale()
   const [title, setTitle] = useState('')
   const [format, setFormat] = useState<FormatKey>('start-stop-continue')
   const [loading, setLoading] = useState(false)
@@ -16,7 +20,7 @@ export default function CreateRetro() {
     e.preventDefault()
     
     if (!title.trim()) {
-      setError('Inserisci un titolo per la retro')
+      setError(t('create.errorTitle'))
       return
     }
 
@@ -33,45 +37,46 @@ export default function CreateRetro() {
       .single()
 
     if (dbError) {
-      setError('Errore nella creazione. Riprova.')
+      setError(t('create.errorGeneric'))
       setLoading(false)
       return
     }
 
-    // Redirect to dashboard with the retro
     router.push(`/dashboard/${data.access_code}`)
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-12">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher currentLocale={locale} />
+      </div>
+
       <div className="max-w-xl mx-auto px-4">
         <Link href="/" className="text-slate-400 hover:text-white mb-8 inline-block">
-          ← Torna alla home
+          ← {t('common.backHome')}
         </Link>
 
         <div className="bg-slate-800 rounded-lg p-8 border border-slate-700">
-          <h1 className="text-2xl font-bold text-white mb-6">Crea una nuova Retro</h1>
+          <h1 className="text-2xl font-bold text-white mb-6">{t('create.title')}</h1>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Title */}
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-slate-300 mb-2">
-                Titolo
+                {t('create.titleLabel')}
               </label>
               <input
                 type="text"
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="es. Sprint 42 - Febbraio 2026"
+                placeholder={t('create.titlePlaceholder')}
                 className="w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
               />
             </div>
 
-            {/* Format */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-3">
-                Formato
+                {t('create.formatLabel')}
               </label>
               <div className="space-y-3">
                 {(Object.keys(FORMATS) as FormatKey[]).map((key) => (
@@ -92,10 +97,10 @@ export default function CreateRetro() {
                       className="sr-only"
                     />
                     <div>
-                      <div className="font-medium text-white">{FORMATS[key].name}</div>
+                      <div className="font-medium text-white">{t(`formats.${key}.name`)}</div>
                       <div className="text-sm text-slate-400 mt-1">
                         {FORMATS[key].categories.map((cat) => 
-                          FORMATS[key].labels[cat as keyof typeof FORMATS[typeof key]['labels']]
+                          t(`formats.${key}.${cat}`)
                         ).join(' • ')}
                       </div>
                     </div>
@@ -113,7 +118,7 @@ export default function CreateRetro() {
               disabled={loading}
               className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
             >
-              {loading ? 'Creazione...' : 'Crea Retro →'}
+              {loading ? t('create.submitting') : t('create.submit')}
             </button>
           </form>
         </div>

@@ -1,0 +1,88 @@
+{
+  "common": {
+    "backHome": "Torna alla home",
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "retry": "Riprova"
+  },
+  "home": {
+    "title": "RetroShift",
+    "subtitle": "Retrospettive anonime e asincrone per il tuo team.",
+    "subtitleHighlight": "Niente silenzi imbarazzanti. Solo feedback onesto.",
+    "cta": "Crea una Retro →",
+    "free": "Gratis • Nessuna registrazione richiesta",
+    "howItWorks": "Come funziona",
+    "step1Title": "Crea la retro",
+    "step1Desc": "Scegli un formato e ricevi un link da condividere col team.",
+    "step2Title": "Il team scrive",
+    "step2Desc": "Feedback anonimo, quando vogliono, senza pressioni.",
+    "step3Title": "Vedi i risultati",
+    "step3Desc": "Tutti i feedback aggregati in una dashboard chiara.",
+    "formats": "Formati disponibili",
+    "footer": "Made with 🦞 by"
+  },
+  "create": {
+    "title": "Crea una nuova Retro",
+    "titleLabel": "Titolo",
+    "titlePlaceholder": "es. Sprint 42 - Febbraio 2026",
+    "formatLabel": "Formato",
+    "submit": "Crea Retro →",
+    "submitting": "Creazione...",
+    "errorTitle": "Inserisci un titolo per la retro",
+    "errorGeneric": "Errore nella creazione. Riprova."
+  },
+  "participate": {
+    "anonymous": "Il tuo feedback è completamente anonimo",
+    "placeholder": "Scrivi qui il tuo feedback...",
+    "submit": "Invia Feedback Anonimo →",
+    "submitting": "Invio...",
+    "errorEmpty": "Scrivi almeno un feedback",
+    "errorGeneric": "Errore nel salvataggio. Riprova.",
+    "thanks": "Grazie!",
+    "sent": "Il tuo feedback è stato inviato in modo anonimo.",
+    "addMore": "Aggiungi altro feedback",
+    "closed": "Questa retro è stata chiusa",
+    "notFound": "Retro non trovata",
+    "createNew": "Crea una nuova retro"
+  },
+  "dashboard": {
+    "feedbackCount": "{count} feedback ricevuti",
+    "copyLink": "🔗 Copia link per il team",
+    "copied": "✓ Copiato!",
+    "close": "🔒 Chiudi retro",
+    "reopen": "🔓 Riapri",
+    "closedBanner": "Questa retro è chiusa. Il team non può più aggiungere feedback.",
+    "shareTitle": "👋 Condividi con il team",
+    "shareDesc": "Copia questo link e condividilo su Slack, Teams, o email. Il team può rispondere in modo anonimo.",
+    "copy": "Copia",
+    "noFeedback": "Nessun feedback ancora",
+    "responses": "{count} risposte",
+    "autoRefresh": "I nuovi feedback appariranno automaticamente 🔄"
+  },
+  "formats": {
+    "start-stop-continue": {
+      "name": "Start / Stop / Continue",
+      "start": "🚀 Start",
+      "stop": "🛑 Stop",
+      "continue": "✅ Continue"
+    },
+    "mad-sad-glad": {
+      "name": "Mad / Sad / Glad",
+      "mad": "😠 Mad",
+      "sad": "😢 Sad",
+      "glad": "😊 Glad"
+    },
+    "liked-learned-lacked": {
+      "name": "Liked / Learned / Lacked",
+      "liked": "❤️ Liked",
+      "learned": "💡 Learned",
+      "lacked": "🤔 Lacked"
+    }
+  },
+  "notFound": {
+    "title": "Pagina non trovata",
+    "desc": "La pagina che stai cercando non esiste.",
+    "retroTitle": "Retro non trovata",
+    "retroDesc": "Il link potrebbe essere scaduto o non valido."
+  }
+}
