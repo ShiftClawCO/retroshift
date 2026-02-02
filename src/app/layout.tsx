@@ -16,6 +16,16 @@ export const metadata: Metadata = {
   title: "RetroShift - Retrospettive Anonime per Team Agile",
   description: "Crea retrospettive anonime e asincrone per il tuo team. Niente silenzi imbarazzanti, solo feedback onesto.",
   keywords: ["retrospettiva", "agile", "scrum", "team", "feedback", "anonimo"],
+  openGraph: {
+    title: "RetroShift - Retrospettive Anonime per Team Agile",
+    description: "Crea retrospettive anonime e asincrone per il tuo team.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RetroShift",
+    description: "Retrospettive anonime e asincrone per team agile.",
+  },
 };
 
 export default function RootLayout({
