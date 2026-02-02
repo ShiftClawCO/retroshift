@@ -4,8 +4,10 @@ import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
-import { supabase, Retro, Entry, FORMATS, FormatKey } from '@/lib/supabase'
+import { supabase, Retro, Entry, Vote, FORMATS, FormatKey } from '@/lib/supabase'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
+import VoteButtons from '@/components/VoteButtons'
+import AISummary from '@/components/AISummary'
 
 export default function DashboardPage() {
   const params = useParams()
@@ -15,6 +17,7 @@ export default function DashboardPage() {
   
   const [retro, setRetro] = useState<Retro | null>(null)
   const [entries, setEntries] = useState<Entry[]>([])
+  const [votes, setVotes] = useState<Vote[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
@@ -41,8 +44,19 @@ export default function DashboardPage() {
       .order('created_at', { ascending: true })
 
     setEntries(entriesData || [])
+
+    // Load votes for all entries
+    if (entriesData && entriesData.length > 0) {
+      const entryIds = entriesData.map(e => e.id)
+      const { data: votesData } = await supabase
+        .from('votes')
+        .select('*')
+        .in('entry_id', entryIds)
+      
+      setVotes(votesData || [])
+    }
+
     setLoading(false)
-    
     return retroData
   }, [code, t])
 
@@ -53,7 +67,6 @@ export default function DashboardPage() {
       const retroData = await loadData()
       
       if (retroData) {
-        // Subscribe to real-time updates
         channel = supabase
           .channel(`entries-${retroData.id}`)
           .on(
@@ -99,6 +112,10 @@ export default function DashboardPage() {
     if (!updateError) {
       setRetro(prev => prev ? { ...prev, is_closed: !prev.is_closed } : null)
     }
+  }
+
+  const getVotesForEntry = (entryId: string) => {
+    return votes.filter(v => v.entry_id === entryId)
   }
 
   if (loading) {
@@ -191,6 +208,9 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* AI Summary */}
+        <AISummary retroId={retro!.id} hasEntries={entries.length > 0} />
+
         {/* Closed banner */}
         {retro!.is_closed && (
           <div className="bg-slate-700 border border-slate-600 rounded-lg p-4 mb-8 flex items-center justify-between">
@@ -225,6 +245,10 @@ export default function DashboardPage() {
                     <p className="text-slate-500 text-xs mt-2">
                       {new Date(entry.created_at).toLocaleString(locale === 'it' ? 'it-IT' : 'en-US')}
                     </p>
+                    <VoteButtons 
+                      entryId={entry.id} 
+                      initialVotes={getVotesForEntry(entry.id)}
+                    />
                   </div>
                 ))
               )}

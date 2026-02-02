@@ -142,5 +142,12 @@
     "desc": "The page you're looking for doesn't exist.",
     "retroTitle": "Retro not found",
     "retroDesc": "The link may have expired or is invalid."
+  },
+  "summary": {
+    "title": "AI Summary",
+    "generate": "Generate Summary",
+    "regenerate": "Regenerate",
+    "generating": "Generating...",
+    "description": "Click to generate an AI summary of the feedback with key themes and suggested actions."
   }
 }

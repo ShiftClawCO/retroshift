@@ -142,5 +142,12 @@
     "desc": "La pagina che stai cercando non esiste.",
     "retroTitle": "Retro non trovata",
     "retroDesc": "Il link potrebbe essere scaduto o non valido."
+  },
+  "summary": {
+    "title": "AI Summary",
+    "generate": "Genera Summary",
+    "regenerate": "Rigenera",
+    "generating": "Generazione...",
+    "description": "Clicca per generare un riassunto AI dei feedback con i temi principali e azioni suggerite."
   }
 }

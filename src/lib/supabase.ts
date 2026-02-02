@@ -25,6 +25,14 @@ export interface Entry {
   created_at: string
 }
 
+export interface Vote {
+  id: string
+  entry_id: string
+  emoji: '👍' | '🔥' | '💡'
+  voter_id: string
+  created_at: string
+}
+
 export const FORMATS = {
   'start-stop-continue': {
     name: 'Start / Stop / Continue',
@@ -71,3 +79,18 @@ export const FORMATS = {
 } as const
 
 export type FormatKey = keyof typeof FORMATS
+
+export const VOTE_EMOJIS = ['👍', '🔥', '💡'] as const
+export type VoteEmoji = typeof VOTE_EMOJIS[number]
+
+// Get or create anonymous voter ID
+export function getVoterId(): string {
+  if (typeof window === 'undefined') return ''
+  
+  let voterId = localStorage.getItem('retroshift_voter_id')
+  if (!voterId) {
+    voterId = crypto.randomUUID()
+    localStorage.setItem('retroshift_voter_id', voterId)
+  }
+  return voterId
+}
