@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
@@ -15,6 +15,8 @@ import Header from '@/components/Header'
 import VoteButtons from '@/components/VoteButtons'
 import AISummary from '@/components/AISummary'
 import Leaderboard from '@/components/Leaderboard'
+import KeyboardHints from '@/components/KeyboardHints'
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 
 export default function DashboardPage() {
   const params = useParams()
@@ -156,6 +158,17 @@ export default function DashboardPage() {
       return [...otherVotes, ...newVotes]
     })
   }
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: 'c', action: copyShareLink, description: 'Copy share link' },
+    { key: 'l', action: toggleClose, description: 'Lock/Unlock retro' },
+  ])
+
+  const keyboardHints = [
+    { keys: ['C'], description: 'Copy link' },
+    { keys: ['L'], description: 'Lock/Unlock' },
+  ]
 
   if (loading) {
     return (
@@ -317,6 +330,8 @@ export default function DashboardPage() {
           {t('dashboard.autoRefresh')}
         </p>
       </main>
+
+      <KeyboardHints hints={keyboardHints} />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import Header from '@/components/Header'
+import KeyboardHints from '@/components/KeyboardHints'
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 
 // Generate unique default title
 function generateDefaultTitle(): string {
@@ -28,6 +30,16 @@ export default function CreateRetro() {
   const [format, setFormat] = useState<FormatKey>('start-stop-continue')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: 'Enter', meta: true, action: () => formRef.current?.requestSubmit(), description: 'Create retro' },
+  ])
+
+  const keyboardHints = [
+    { keys: ['cmd', 'enter'], description: 'Create retro' },
+  ]
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -73,7 +85,7 @@ export default function CreateRetro() {
               <CardTitle>{t('create.title')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <label htmlFor="title" className="text-sm font-medium">
                     {t('create.titleLabel')}
@@ -134,6 +146,8 @@ export default function CreateRetro() {
           </Card>
         </div>
       </main>
+
+      <KeyboardHints hints={keyboardHints} />
     </div>
   )
 }

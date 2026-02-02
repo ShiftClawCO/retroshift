@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import Header from '@/components/Header'
+import KeyboardHints from '@/components/KeyboardHints'
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { Lock, PartyPopper } from 'lucide-react'
 
 export default function ParticipatePage() {
@@ -23,6 +25,16 @@ export default function ParticipatePage() {
   const [entries, setEntries] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: 'Enter', meta: true, action: () => formRef.current?.requestSubmit(), description: 'Submit feedback' },
+  ])
+
+  const keyboardHints = [
+    { keys: ['cmd', 'enter'], description: 'Submit' },
+  ]
 
   useEffect(() => {
     loadRetro()
@@ -171,7 +183,7 @@ export default function ParticipatePage() {
             <p className="text-muted-foreground">{t('participate.anonymous')}</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
             {format.categories.map((category) => {
               const config = getCategoryConfig(category)
               const IconComponent = config.icon
@@ -213,6 +225,8 @@ export default function ParticipatePage() {
           </p>
         </div>
       </main>
+
+      <KeyboardHints hints={keyboardHints} />
     </div>
   )
 }
