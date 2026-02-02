@@ -11,10 +11,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import Header from '@/components/Header'
 
+// Generate unique default title
+function generateDefaultTitle(): string {
+  const now = new Date()
+  const day = now.getDate()
+  const month = now.toLocaleString('en', { month: 'short' })
+  const year = now.getFullYear()
+  const id = Math.random().toString(36).substring(2, 6).toUpperCase()
+  return `Retro ${day} ${month} ${year} #${id}`
+}
+
 export default function CreateRetro() {
   const router = useRouter()
   const t = useTranslations()
-  const [title, setTitle] = useState('')
+  const [title, setTitle] = useState(generateDefaultTitle)
   const [format, setFormat] = useState<FormatKey>('start-stop-continue')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
