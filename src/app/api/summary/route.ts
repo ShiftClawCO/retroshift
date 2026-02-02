@@ -8,6 +8,11 @@ const groq = new Groq({
 
 export async function POST(request: NextRequest) {
   try {
+    // Check API key first
+    if (!process.env.GROQ_API_KEY) {
+      return NextResponse.json({ error: 'GROQ_API_KEY not configured' }, { status: 500 })
+    }
+
     const { retroId, locale = 'en' } = await request.json()
 
     if (!retroId) {
@@ -74,6 +79,7 @@ Be concise and practical.`
     return NextResponse.json({ summary })
   } catch (error) {
     console.error('Summary error:', error)
-    return NextResponse.json({ error: 'Failed to generate summary' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    return NextResponse.json({ error: `Failed to generate summary: ${message}` }, { status: 500 })
   }
 }
