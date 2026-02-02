@@ -1,6 +1,7 @@
 'use client'
 
 import { useTransition } from 'react'
+import { Button } from '@/components/ui/button'
 
 export default function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
   const [isPending, startTransition] = useTransition()
@@ -13,29 +14,25 @@ export default function LanguageSwitcher({ currentLocale }: { currentLocale: str
   }
 
   return (
-    <div className="flex gap-2 text-sm">
-      <button
+    <div className="flex gap-1">
+      <Button
+        variant={currentLocale === 'it' ? 'secondary' : 'ghost'}
+        size="sm"
         onClick={() => switchLocale('it')}
         disabled={isPending}
-        className={`px-2 py-1 rounded transition-colors ${
-          currentLocale === 'it' 
-            ? 'bg-slate-700 text-white' 
-            : 'text-slate-400 hover:text-white'
-        }`}
+        className="h-8 px-2 text-xs"
       >
         IT
-      </button>
-      <button
+      </Button>
+      <Button
+        variant={currentLocale === 'en' ? 'secondary' : 'ghost'}
+        size="sm"
         onClick={() => switchLocale('en')}
         disabled={isPending}
-        className={`px-2 py-1 rounded transition-colors ${
-          currentLocale === 'en' 
-            ? 'bg-slate-700 text-white' 
-            : 'text-slate-400 hover:text-white'
-        }`}
+        className="h-8 px-2 text-xs"
       >
         EN
-      </button>
+      </Button>
     </div>
   )
 }

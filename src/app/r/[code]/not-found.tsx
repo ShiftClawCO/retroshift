@@ -1,21 +1,22 @@
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 
 export default function RetroNotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-      <div className="text-center">
-        <div className="text-6xl mb-4">🔍</div>
-        <h1 className="text-2xl font-bold text-white mb-2">Retro non trovata</h1>
-        <p className="text-slate-400 mb-6">
-          Il link potrebbe essere scaduto o non valido.
-        </p>
-        <Link 
-          href="/"
-          className="inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
-        >
-          Crea una nuova retro
-        </Link>
-      </div>
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <Card className="text-center p-8 max-w-md">
+        <CardContent>
+          <div className="text-6xl mb-4">🔍</div>
+          <h1 className="text-2xl font-bold mb-2">Retro non trovata</h1>
+          <p className="text-muted-foreground mb-6">
+            Il link potrebbe essere scaduto o non valido.
+          </p>
+          <Button asChild>
+            <Link href="/">Crea una nuova retro</Link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }

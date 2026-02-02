@@ -3,14 +3,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { supabase, FORMATS, FormatKey } from '@/lib/supabase'
-import LanguageSwitcher from '@/components/LanguageSwitcher'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import Header from '@/components/Header'
 
 export default function CreateRetro() {
   const router = useRouter()
   const t = useTranslations()
-  const locale = useLocale()
   const [title, setTitle] = useState('')
   const [format, setFormat] = useState<FormatKey>('start-stop-continue')
   const [loading, setLoading] = useState(false)
@@ -46,81 +48,72 @@ export default function CreateRetro() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-12">
-      <div className="absolute top-4 right-4">
-        <LanguageSwitcher currentLocale={locale} />
-      </div>
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <div className="container py-12">
+        <div className="max-w-xl mx-auto">
+          <Link href="/" className="text-muted-foreground hover:text-foreground mb-8 inline-block text-sm">
+            ← {t('common.backHome')}
+          </Link>
 
-      <div className="max-w-xl mx-auto px-4">
-        <Link href="/" className="text-slate-400 hover:text-white mb-8 inline-block">
-          ← {t('common.backHome')}
-        </Link>
-
-        <div className="bg-slate-800 rounded-lg p-8 border border-slate-700">
-          <h1 className="text-2xl font-bold text-white mb-6">{t('create.title')}</h1>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-slate-300 mb-2">
-                {t('create.titleLabel')}
-              </label>
-              <input
-                type="text"
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder={t('create.titlePlaceholder')}
-                className="w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-3">
-                {t('create.formatLabel')}
-              </label>
-              <div className="space-y-3">
-                {(Object.keys(FORMATS) as FormatKey[]).map((key) => (
-                  <label
-                    key={key}
-                    className={`flex items-center p-4 rounded-lg border cursor-pointer transition-colors ${
-                      format === key
-                        ? 'bg-emerald-900/30 border-emerald-500'
-                        : 'bg-slate-900 border-slate-600 hover:border-slate-500'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="format"
-                      value={key}
-                      checked={format === key}
-                      onChange={() => setFormat(key)}
-                      className="sr-only"
-                    />
-                    <div>
-                      <div className="font-medium text-white">{t(`formats.${key}.name`)}</div>
-                      <div className="text-sm text-slate-400 mt-1">
-                        {FORMATS[key].categories.map((cat) => 
-                          t(`formats.${key}.${cat}`)
-                        ).join(' • ')}
-                      </div>
-                    </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('create.title')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <label htmlFor="title" className="text-sm font-medium">
+                    {t('create.titleLabel')}
                   </label>
-                ))}
-              </div>
-            </div>
+                  <Input
+                    type="text"
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder={t('create.titlePlaceholder')}
+                  />
+                </div>
 
-            {error && (
-              <div className="text-red-400 text-sm">{error}</div>
-            )}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium">
+                    {t('create.formatLabel')}
+                  </label>
+                  <div className="space-y-3">
+                    {(Object.keys(FORMATS) as FormatKey[]).map((key) => (
+                      <div
+                        key={key}
+                        onClick={() => setFormat(key)}
+                        className={`flex items-center p-4 rounded-lg border cursor-pointer transition-colors ${
+                          format === key
+                            ? 'bg-primary/10 border-primary'
+                            : 'bg-card hover:border-primary/50'
+                        }`}
+                      >
+                        <div>
+                          <div className="font-medium">{t(`formats.${key}.name`)}</div>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            {FORMATS[key].categories.map((cat) => 
+                              t(`formats.${key}.${cat}`)
+                            ).join(' • ')}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
-            >
-              {loading ? t('create.submitting') : t('create.submit')}
-            </button>
-          </form>
+                {error && (
+                  <div className="text-destructive text-sm">{error}</div>
+                )}
+
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? t('create.submitting') : t('create.submit')}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

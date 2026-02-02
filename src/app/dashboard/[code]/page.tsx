@@ -5,7 +5,11 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { supabase, Retro, Entry, Vote, FORMATS, FormatKey } from '@/lib/supabase'
-import LanguageSwitcher from '@/components/LanguageSwitcher'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import Header from '@/components/Header'
 import VoteButtons from '@/components/VoteButtons'
 import AISummary from '@/components/AISummary'
 import Leaderboard from '@/components/Leaderboard'
@@ -46,7 +50,6 @@ export default function DashboardPage() {
 
     setEntries(entriesData || [])
 
-    // Load votes for all entries
     if (entriesData && entriesData.length > 0) {
       const entryIds = entriesData.map(e => e.id)
       const { data: votesData } = await supabase
@@ -69,7 +72,6 @@ export default function DashboardPage() {
       const retroData = await loadData()
       
       if (retroData) {
-        // Try real-time subscription
         channel = supabase
           .channel(`entries-${retroData.id}`)
           .on(
@@ -82,7 +84,6 @@ export default function DashboardPage() {
             },
             (payload) => {
               setEntries(prev => {
-                // Avoid duplicates
                 if (prev.some(e => e.id === (payload.new as Entry).id)) return prev
                 return [...prev, payload.new as Entry]
               })
@@ -92,7 +93,6 @@ export default function DashboardPage() {
             console.log('Realtime status:', status)
           })
 
-        // Fallback polling every 5 seconds
         pollInterval = setInterval(async () => {
           const { data: entriesData } = await supabase
             .from('entries')
@@ -102,7 +102,6 @@ export default function DashboardPage() {
           
           if (entriesData) {
             setEntries(prev => {
-              // Only update if there are new entries
               if (entriesData.length !== prev.length) {
                 return entriesData
               }
@@ -151,7 +150,6 @@ export default function DashboardPage() {
 
   const handleVoteChange = (entryId: string, newVotes: Vote[]) => {
     setVotes(prev => {
-      // Remove old votes for this entry, add new ones
       const otherVotes = prev.filter(v => v.entry_id !== entryId)
       return [...otherVotes, ...newVotes]
     })
@@ -159,21 +157,23 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-slate-400">{t('common.loading')}</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">{t('common.loading')}</div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-400 mb-4">{error}</div>
-          <Link href="/" className="text-emerald-400 hover:text-emerald-300">
-            {t('common.backHome')}
-          </Link>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="text-center p-6">
+          <CardContent>
+            <div className="text-destructive mb-4">{error}</div>
+            <Button asChild variant="outline">
+              <Link href="/">{t('common.backHome')}</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -184,67 +184,71 @@ export default function DashboardPage() {
     return acc
   }, {} as Record<string, Entry[]>)
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-8">
-      <div className="absolute top-4 right-4">
-        <LanguageSwitcher currentLocale={locale} />
-      </div>
+  const getCategoryStyles = (category: string) => {
+    const colorMap: Record<string, string> = {
+      start: 'border-l-green-500 bg-green-500/5',
+      stop: 'border-l-red-500 bg-red-500/5',
+      continue: 'border-l-blue-500 bg-blue-500/5',
+      mad: 'border-l-red-500 bg-red-500/5',
+      sad: 'border-l-blue-500 bg-blue-500/5',
+      glad: 'border-l-green-500 bg-green-500/5',
+      liked: 'border-l-pink-500 bg-pink-500/5',
+      learned: 'border-l-yellow-500 bg-yellow-500/5',
+      lacked: 'border-l-gray-500 bg-gray-500/5',
+    }
+    return colorMap[category] || ''
+  }
 
-      <div className="max-w-6xl mx-auto px-4">
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <div className="container py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
-            <Link href="/" className="text-slate-400 hover:text-white text-sm mb-2 inline-block">
+            <Link href="/" className="text-muted-foreground hover:text-foreground text-sm mb-2 inline-block">
               ← {t('common.backHome')}
             </Link>
-            <h1 className="text-2xl font-bold text-white">{retro!.title}</h1>
-            <p className="text-slate-400 text-sm mt-1">
+            <h1 className="text-2xl font-bold">{retro!.title}</h1>
+            <p className="text-muted-foreground text-sm mt-1">
               {t('dashboard.feedbackCount', { count: entries.length })} • {t(`formats.${retro!.format}.name`)}
             </p>
           </div>
 
           <div className="flex gap-3">
-            <button
-              onClick={copyShareLink}
-              className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
-            >
+            <Button variant="outline" onClick={copyShareLink}>
               {copied ? t('dashboard.copied') : t('dashboard.copyLink')}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant={retro!.is_closed ? 'default' : 'destructive'}
               onClick={toggleClose}
-              className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-                retro!.is_closed
-                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                  : 'bg-red-600 hover:bg-red-500 text-white'
-              }`}
             >
               {retro!.is_closed ? t('dashboard.reopen') : t('dashboard.close')}
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Share banner */}
         {entries.length === 0 && (
-          <div className="bg-emerald-900/30 border border-emerald-600 rounded-lg p-6 mb-8">
-            <h3 className="text-emerald-400 font-semibold mb-2">{t('dashboard.shareTitle')}</h3>
-            <p className="text-slate-300 text-sm mb-4">
-              {t('dashboard.shareDesc')}
-            </p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                readOnly
-                value={`${typeof window !== 'undefined' ? window.location.origin : ''}/r/${code}`}
-                className="flex-1 px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-300 text-sm"
-              />
-              <button
-                onClick={copyShareLink}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
-              >
-                {copied ? t('dashboard.copied') : t('dashboard.copy')}
-              </button>
-            </div>
-          </div>
+          <Card className="border-primary bg-primary/5 mb-8">
+            <CardHeader>
+              <CardTitle className="text-lg">{t('dashboard.shareTitle')}</CardTitle>
+              <CardDescription>{t('dashboard.shareDesc')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={`${typeof window !== 'undefined' ? window.location.origin : ''}/r/${code}`}
+                  className="flex-1"
+                />
+                <Button onClick={copyShareLink}>
+                  {copied ? t('dashboard.copied') : t('dashboard.copy')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* AI Summary */}
@@ -255,44 +259,50 @@ export default function DashboardPage() {
 
         {/* Closed banner */}
         {retro!.is_closed && (
-          <div className="bg-slate-700 border border-slate-600 rounded-lg p-4 mb-8 flex items-center justify-between">
-            <span className="text-slate-300">🔒 {t('dashboard.closedBanner')}</span>
-          </div>
+          <Card className="border-destructive bg-destructive/5 mb-8">
+            <CardContent className="flex items-center gap-2 py-4">
+              <span>🔒</span>
+              <span>{t('dashboard.closedBanner')}</span>
+            </CardContent>
+          </Card>
         )}
 
         {/* Entries grid */}
         <div className="grid md:grid-cols-3 gap-6">
           {format.categories.map((category) => (
             <div key={category} className="space-y-4">
-              <div className={`p-4 rounded-lg border ${format.colors[category as keyof typeof format.colors]}`}>
-                <h2 className="text-lg font-semibold text-slate-800">
-                  {t(`formats.${retro!.format}.${category}`)}
-                </h2>
-                <p className="text-slate-600 text-sm">
-                  {t('dashboard.responses', { count: entriesByCategory[category].length })}
-                </p>
-              </div>
+              <Card className={`border-l-4 ${getCategoryStyles(category)}`}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">
+                    {t(`formats.${retro!.format}.${category}`)}
+                  </CardTitle>
+                  <CardDescription>
+                    {t('dashboard.responses', { count: entriesByCategory[category].length })}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
 
               {entriesByCategory[category].length === 0 ? (
-                <div className="text-slate-500 text-sm p-4 text-center border border-dashed border-slate-700 rounded-lg">
-                  {t('dashboard.noFeedback')}
-                </div>
+                <Card className="border-dashed">
+                  <CardContent className="py-8 text-center text-muted-foreground text-sm">
+                    {t('dashboard.noFeedback')}
+                  </CardContent>
+                </Card>
               ) : (
                 entriesByCategory[category].map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="bg-slate-800 border border-slate-700 rounded-lg p-4"
-                  >
-                    <p className="text-slate-200 whitespace-pre-wrap">{entry.content}</p>
-                    <p className="text-slate-500 text-xs mt-2">
-                      {new Date(entry.created_at).toLocaleString(locale === 'it' ? 'it-IT' : 'en-US')}
-                    </p>
-                    <VoteButtons 
-                      entryId={entry.id} 
-                      initialVotes={getVotesForEntry(entry.id)}
-                      onVoteChange={(newVotes) => handleVoteChange(entry.id, newVotes)}
-                    />
-                  </div>
+                  <Card key={entry.id}>
+                    <CardContent className="pt-4">
+                      <p className="whitespace-pre-wrap">{entry.content}</p>
+                      <p className="text-muted-foreground text-xs mt-2">
+                        {new Date(entry.created_at).toLocaleString(locale === 'it' ? 'it-IT' : 'en-US')}
+                      </p>
+                      <VoteButtons 
+                        entryId={entry.id} 
+                        initialVotes={getVotesForEntry(entry.id)}
+                        onVoteChange={(newVotes) => handleVoteChange(entry.id, newVotes)}
+                      />
+                    </CardContent>
+                  </Card>
                 ))
               )}
             </div>
@@ -300,7 +310,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Refresh hint */}
-        <p className="text-center text-slate-500 text-sm mt-8">
+        <p className="text-center text-muted-foreground text-sm mt-8">
           {t('dashboard.autoRefresh')}
         </p>
       </div>

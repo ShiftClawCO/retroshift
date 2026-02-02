@@ -3,15 +3,17 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { supabase, Retro, FORMATS, FormatKey } from '@/lib/supabase'
-import LanguageSwitcher from '@/components/LanguageSwitcher'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Textarea } from '@/components/ui/textarea'
+import Header from '@/components/Header'
 
 export default function ParticipatePage() {
   const params = useParams()
   const code = params.code as string
   const t = useTranslations()
-  const locale = useLocale()
   
   const [retro, setRetro] = useState<Retro | null>(null)
   const [loading, setLoading] = useState(true)
@@ -84,114 +86,134 @@ export default function ParticipatePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-slate-400">{t('common.loading')}</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">{t('common.loading')}</div>
       </div>
     )
   }
 
   if (error && !retro) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-400 mb-4">{error}</div>
-          <Link href="/" className="text-emerald-400 hover:text-emerald-300">
-            {t('common.backHome')}
-          </Link>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="text-center p-6">
+          <CardContent>
+            <div className="text-destructive mb-4">{error}</div>
+            <Button asChild variant="outline">
+              <Link href="/">{t('common.backHome')}</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   if (retro?.is_closed) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-2xl mb-2">🔒</div>
-          <div className="text-slate-400 mb-4">{t('participate.closed')}</div>
-          <Link href="/" className="text-emerald-400 hover:text-emerald-300">
-            {t('participate.createNew')}
-          </Link>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="text-center p-6">
+          <CardContent>
+            <div className="text-4xl mb-4">🔒</div>
+            <CardDescription className="mb-4">{t('participate.closed')}</CardDescription>
+            <Button asChild variant="outline">
+              <Link href="/">{t('participate.createNew')}</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4">✅</div>
-          <h1 className="text-2xl font-bold text-white mb-2">{t('participate.thanks')}</h1>
-          <p className="text-slate-400 mb-6">{t('participate.sent')}</p>
-          <button
-            onClick={() => {
-              setSubmitted(false)
-              const format = FORMATS[retro!.format as FormatKey]
-              const resetEntries: Record<string, string> = {}
-              format.categories.forEach(cat => {
-                resetEntries[cat] = ''
-              })
-              setEntries(resetEntries)
-            }}
-            className="text-emerald-400 hover:text-emerald-300"
-          >
-            {t('participate.addMore')}
-          </button>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="text-center p-8 max-w-md">
+          <CardContent>
+            <div className="text-5xl mb-4">✅</div>
+            <CardTitle className="mb-2">{t('participate.thanks')}</CardTitle>
+            <CardDescription className="mb-6">{t('participate.sent')}</CardDescription>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSubmitted(false)
+                const format = FORMATS[retro!.format as FormatKey]
+                const resetEntries: Record<string, string> = {}
+                format.categories.forEach(cat => {
+                  resetEntries[cat] = ''
+                })
+                setEntries(resetEntries)
+              }}
+            >
+              {t('participate.addMore')}
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   const format = FORMATS[retro!.format as FormatKey]
 
+  const getCategoryStyles = (category: string) => {
+    const colorMap: Record<string, string> = {
+      start: 'border-l-green-500 bg-green-500/5',
+      stop: 'border-l-red-500 bg-red-500/5',
+      continue: 'border-l-blue-500 bg-blue-500/5',
+      mad: 'border-l-red-500 bg-red-500/5',
+      sad: 'border-l-blue-500 bg-blue-500/5',
+      glad: 'border-l-green-500 bg-green-500/5',
+      liked: 'border-l-pink-500 bg-pink-500/5',
+      learned: 'border-l-yellow-500 bg-yellow-500/5',
+      lacked: 'border-l-gray-500 bg-gray-500/5',
+    }
+    return colorMap[category] || ''
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-12">
-      <div className="absolute top-4 right-4">
-        <LanguageSwitcher currentLocale={locale} />
-      </div>
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <div className="container py-12">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold mb-2">{retro!.title}</h1>
+            <p className="text-muted-foreground">{t('participate.anonymous')}</p>
+          </div>
 
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-white mb-2">{retro!.title}</h1>
-          <p className="text-slate-400">{t('participate.anonymous')}</p>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {format.categories.map((category) => (
+              <Card 
+                key={category}
+                className={`border-l-4 ${getCategoryStyles(category)}`}
+              >
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">
+                    {t(`formats.${retro!.format}.${category}`)}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={entries[category] || ''}
+                    onChange={(e) => setEntries(prev => ({ ...prev, [category]: e.target.value }))}
+                    placeholder={t('participate.placeholder')}
+                    rows={3}
+                  />
+                </CardContent>
+              </Card>
+            ))}
+
+            {error && (
+              <div className="text-destructive text-sm text-center">{error}</div>
+            )}
+
+            <Button type="submit" disabled={submitting} size="lg" className="w-full">
+              {submitting ? t('participate.submitting') : t('participate.submit')}
+            </Button>
+          </form>
+
+          <p className="text-center text-muted-foreground text-sm mt-8">
+            Powered by <Link href="/" className="text-foreground hover:underline">RetroShift</Link>
+          </p>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {format.categories.map((category) => (
-            <div 
-              key={category}
-              className={`p-6 rounded-lg border ${format.colors[category as keyof typeof format.colors]}`}
-            >
-              <label className="block text-lg font-medium text-slate-800 mb-3">
-                {t(`formats.${retro!.format}.${category}`)}
-              </label>
-              <textarea
-                value={entries[category] || ''}
-                onChange={(e) => setEntries(prev => ({ ...prev, [category]: e.target.value }))}
-                placeholder={t('participate.placeholder')}
-                rows={3}
-                className="w-full px-4 py-3 bg-white/80 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-          ))}
-
-          {error && (
-            <div className="text-red-400 text-sm text-center">{error}</div>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-600 text-white font-semibold px-6 py-4 rounded-lg transition-colors text-lg"
-          >
-            {submitting ? t('participate.submitting') : t('participate.submit')}
-          </button>
-        </form>
-
-        <p className="text-center text-slate-500 text-sm mt-8">
-          Powered by <a href="/" className="text-slate-400 hover:text-white">RetroShift</a>
-        </p>
       </div>
     </div>
   )
