@@ -155,6 +155,8 @@
   },
   "leaderboard": {
     "title": "Top Feedback",
+    "controversialTitle": "Needs Attention",
+    "controversialDesc": "Feedback with negative reactions — may need discussion.",
     "points": "points",
     "scoring": "Scoring"
   }

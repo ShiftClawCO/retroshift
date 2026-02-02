@@ -155,6 +155,8 @@
   },
   "leaderboard": {
     "title": "Top Feedback",
+    "controversialTitle": "Da Rivedere",
+    "controversialDesc": "Feedback con reazioni negative — potrebbero richiedere attenzione.",
     "points": "punti",
     "scoring": "Punteggio"
   }
