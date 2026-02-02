@@ -62,11 +62,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     let channel: ReturnType<typeof supabase.channel> | null = null
+    let pollInterval: NodeJS.Timeout | null = null
 
     const setup = async () => {
       const retroData = await loadData()
       
       if (retroData) {
+        // Try real-time subscription
         channel = supabase
           .channel(`entries-${retroData.id}`)
           .on(
@@ -78,10 +80,35 @@ export default function DashboardPage() {
               filter: `retro_id=eq.${retroData.id}`,
             },
             (payload) => {
-              setEntries(prev => [...prev, payload.new as Entry])
+              setEntries(prev => {
+                // Avoid duplicates
+                if (prev.some(e => e.id === (payload.new as Entry).id)) return prev
+                return [...prev, payload.new as Entry]
+              })
             }
           )
-          .subscribe()
+          .subscribe((status) => {
+            console.log('Realtime status:', status)
+          })
+
+        // Fallback polling every 5 seconds
+        pollInterval = setInterval(async () => {
+          const { data: entriesData } = await supabase
+            .from('entries')
+            .select('*')
+            .eq('retro_id', retroData.id)
+            .order('created_at', { ascending: true })
+          
+          if (entriesData) {
+            setEntries(prev => {
+              // Only update if there are new entries
+              if (entriesData.length !== prev.length) {
+                return entriesData
+              }
+              return prev
+            })
+          }
+        }, 5000)
       }
     }
 
@@ -90,6 +117,9 @@ export default function DashboardPage() {
     return () => {
       if (channel) {
         supabase.removeChannel(channel)
+      }
+      if (pollInterval) {
+        clearInterval(pollInterval)
       }
     }
   }, [loadData])
