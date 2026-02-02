@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Entry } from '@/lib/supabase'
 
@@ -19,20 +19,33 @@ export default function AISummary({ retroId, entries }: AISummaryProps) {
 
   // Create a hash of entries to detect changes
   const entriesHash = useMemo(() => {
+    if (entries.length === 0) return ''
     const content = entries
       .map(e => `${e.category}:${e.content}`)
       .sort()
       .join('|')
-    return btoa(content).slice(0, 32)
+    // Use a simple hash instead of btoa to avoid encoding issues
+    let hash = 0
+    for (let i = 0; i < content.length; i++) {
+      const char = content.charCodeAt(i)
+      hash = ((hash << 5) - hash) + char
+      hash = hash & hash
+    }
+    return hash.toString(36)
   }, [entries])
 
-  const hasNewFeedback = lastEntriesHash !== entriesHash
-  const canGenerate = entries.length > 0 && (hasNewFeedback || !summary)
+  // Parse summary into sections - MUST be before any conditional return
+  const parsedSummary = useMemo(() => {
+    if (!summary) return null
+    const lines = summary.split('\n').filter(l => l.trim())
+    return { raw: summary, lines }
+  }, [summary])
+
+  const hasNewFeedback = lastEntriesHash !== entriesHash && lastEntriesHash !== null
+  const canGenerate = entries.length > 0 && (!lastEntriesHash || hasNewFeedback || !summary)
 
   const generateSummary = async () => {
-    if (!canGenerate && summary) {
-      return // Don't regenerate if nothing changed
-    }
+    if (loading) return
 
     setLoading(true)
     setError(null)
@@ -59,22 +72,10 @@ export default function AISummary({ retroId, entries }: AISummaryProps) {
     }
   }
 
+  // Conditional return AFTER all hooks
   if (entries.length === 0) {
     return null
   }
-
-  // Parse summary into sections
-  const parsedSummary = useMemo(() => {
-    if (!summary) return null
-    
-    // Try to split by numbered sections or headers
-    const lines = summary.split('\n').filter(l => l.trim())
-    
-    return {
-      raw: summary,
-      lines
-    }
-  }, [summary])
 
   return (
     <div className="bg-gradient-to-br from-purple-900/20 to-slate-800 border border-purple-500/30 rounded-xl p-6 mb-8">
@@ -98,11 +99,11 @@ export default function AISummary({ retroId, entries }: AISummaryProps) {
           
           <button
             onClick={generateSummary}
-            disabled={loading || (!canGenerate && !!summary)}
+            disabled={loading || (!!summary && !hasNewFeedback)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
               loading
                 ? 'bg-slate-700 text-slate-400 cursor-wait'
-                : canGenerate || !summary
+                : canGenerate
                   ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-500/25'
                   : 'bg-slate-700 text-slate-500 cursor-not-allowed'
             }`}
@@ -135,8 +136,6 @@ export default function AISummary({ retroId, entries }: AISummaryProps) {
         <div className="bg-slate-900/50 rounded-lg p-5 border border-slate-700">
           <div className="prose prose-invert prose-sm max-w-none">
             {parsedSummary.lines.map((line, i) => {
-              // Style numbered items or headers
-              const isHeader = /^#+\s/.test(line) || /^\d+\./.test(line) || /^[•\-\*]/.test(line)
               const isAction = line.toLowerCase().includes('action') || line.toLowerCase().includes('azione')
               
               if (line.startsWith('**') || line.startsWith('##')) {
