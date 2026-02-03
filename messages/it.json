@@ -26,6 +26,7 @@
     "clickLink": "Clicca il link nell'email per attivare il tuo account.",
     "logout": "Esci",
     "myRetros": "Le mie Retro",
+    "loadMore": "Carica altre",
     "pricing": "Prezzi",
     "orContinueWith": "oppure continua con",
     "continueWithGoogle": "Continua con Google"
@@ -112,7 +113,10 @@
     "submit": "Crea Retro →",
     "submitting": "Creazione...",
     "errorTitle": "Inserisci un titolo per la retro",
-    "errorGeneric": "Errore nella creazione. Riprova."
+    "errorGeneric": "Errore nella creazione. Riprova.",
+    "limitReached": "Hai raggiunto il limite di {count} retro attive del piano gratuito. Passa a Pro per retro illimitate.",
+    "upgradeToPro": "Passa a Pro",
+    "retroCount": "{current} di {max} retro gratuite usate"
   },
   "participate": {
     "anonymous": "Il tuo feedback è completamente anonimo",

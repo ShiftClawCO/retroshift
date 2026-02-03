@@ -26,6 +26,7 @@
     "clickLink": "Click the link in the email to activate your account.",
     "logout": "Sign out",
     "myRetros": "My Retros",
+    "loadMore": "Load more",
     "pricing": "Pricing",
     "orContinueWith": "or continue with",
     "continueWithGoogle": "Continue with Google"
@@ -112,7 +113,10 @@
     "submit": "Create Retro →",
     "submitting": "Creating...",
     "errorTitle": "Please enter a title for the retro",
-    "errorGeneric": "Error creating retro. Please try again."
+    "errorGeneric": "Error creating retro. Please try again.",
+    "limitReached": "You've reached the free plan limit of {count} active retros. Upgrade to Pro for unlimited retros.",
+    "upgradeToPro": "Upgrade to Pro",
+    "retroCount": "{current} of {max} free retros used"
   },
   "participate": {
     "anonymous": "Your feedback is completely anonymous",

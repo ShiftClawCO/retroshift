@@ -8,35 +8,60 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Header from '@/components/Header'
-import { Plus, ExternalLink, Lock, Unlock } from 'lucide-react'
+import { Plus, ExternalLink, Lock, Unlock, ChevronDown } from 'lucide-react'
 import type { Retro } from '@/lib/supabase'
+
+const PAGE_SIZE = 20
 
 export default function MyRetrosPage() {
   const t = useTranslations()
   const [retros, setRetros] = useState<Retro[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(0)
 
-  useEffect(() => {
-    const fetchRetros = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) return
-
-      const { data, error } = await supabase
-        .from('retros')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (!error && data) {
-        setRetros(data)
-      }
+  const fetchRetros = async (pageNum: number, append = false) => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
       setLoading(false)
+      return
     }
 
-    fetchRetros()
+    const from = pageNum * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
+
+    const { data, error, count } = await supabase
+      .from('retros')
+      .select('*', { count: 'exact' })
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .range(from, to)
+
+    if (!error && data) {
+      if (append) {
+        setRetros(prev => [...prev, ...data])
+      } else {
+        setRetros(data)
+      }
+      setHasMore((count || 0) > (pageNum + 1) * PAGE_SIZE)
+    }
+    setLoading(false)
+    setLoadingMore(false)
+  }
+
+  useEffect(() => {
+    fetchRetros(0)
   }, [])
+
+  const loadMore = () => {
+    setLoadingMore(true)
+    const nextPage = page + 1
+    setPage(nextPage)
+    fetchRetros(nextPage, true)
+  }
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString(undefined, {
@@ -111,6 +136,27 @@ export default function MyRetrosPage() {
                   </CardContent>
                 </Card>
               ))}
+
+              {/* Load more button */}
+              {hasMore && (
+                <div className="flex justify-center pt-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="gap-2"
+                  >
+                    {loadingMore ? (
+                      t('common.loading')
+                    ) : (
+                      <>
+                        <ChevronDown className="w-4 h-4" />
+                        {t('auth.loadMore')}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>
