@@ -9,7 +9,7 @@ import LanguageSwitcher from './LanguageSwitcher'
 import { Button } from './ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { createClient } from '@/lib/supabase/client'
-import { RotateCcw, User, LogOut, LayoutDashboard } from 'lucide-react'
+import { RotateCcw, User, LogOut, LayoutDashboard, CreditCard } from 'lucide-react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 export default function Header() {
@@ -70,6 +70,12 @@ export default function Header() {
                     <Link href="/my-retros" className="flex items-center gap-2">
                       <LayoutDashboard className="h-4 w-4" />
                       {t('auth.myRetros')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/pricing" className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      {t('auth.pricing')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2">

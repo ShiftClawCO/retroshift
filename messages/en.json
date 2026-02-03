@@ -26,6 +26,7 @@
     "clickLink": "Click the link in the email to activate your account.",
     "logout": "Sign out",
     "myRetros": "My Retros",
+    "pricing": "Pricing",
     "orContinueWith": "or continue with",
     "continueWithGoogle": "Continue with Google"
   },
@@ -184,5 +185,46 @@
     "controversialDesc": "Feedback with negative reactions — may need discussion.",
     "points": "points",
     "scoring": "Scoring"
+  },
+  "pricing": {
+    "badge": "Simple Pricing",
+    "title": "Choose your plan",
+    "subtitle": "Start free, upgrade when you need more. No hidden fees.",
+    "forever": "forever",
+    "perMonth": "/month",
+    "currentPlan": "Current plan",
+    "popular": "Most Popular",
+    "processing": "Processing...",
+    
+    "freeName": "Free",
+    "freeDesc": "Perfect for small teams trying retrospectives",
+    "free1": "Up to 3 active retros",
+    "free2": "Up to 10 participants per retro",
+    "free3": "All retro formats",
+    "free4": "AI-powered summaries",
+    "free5": "Links valid for 7 days",
+    "freeCta": "Get Started Free",
+    
+    "proName": "Pro",
+    "proDesc": "For teams running regular retrospectives",
+    "pro1": "Unlimited retros",
+    "pro2": "Unlimited participants",
+    "pro3": "All retro formats",
+    "pro4": "AI-powered summaries",
+    "pro5": "PDF export",
+    "pro6": "Permanent links & full history",
+    "proCta": "Upgrade to Pro",
+    
+    "faqTitle": "Frequently Asked Questions",
+    "faq1Q": "Can I cancel anytime?",
+    "faq1A": "Yes! Cancel with one click from your account. You'll keep access until the end of your billing period.",
+    "faq2Q": "What payment methods do you accept?",
+    "faq2A": "We accept all major credit cards, PayPal, and Apple Pay through our secure payment provider.",
+    "faq3Q": "Do I need a credit card for the free plan?",
+    "faq3A": "No. The free plan is completely free, no credit card required.",
+    "faq4Q": "Can I switch between plans?",
+    "faq4A": "Yes, upgrade or downgrade anytime. Upgrades take effect immediately, downgrades at the next billing cycle.",
+    
+    "guarantee": "30-day money-back guarantee. No questions asked."
   }
 }

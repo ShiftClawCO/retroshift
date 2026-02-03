@@ -26,6 +26,7 @@
     "clickLink": "Clicca il link nell'email per attivare il tuo account.",
     "logout": "Esci",
     "myRetros": "Le mie Retro",
+    "pricing": "Prezzi",
     "orContinueWith": "oppure continua con",
     "continueWithGoogle": "Continua con Google"
   },
@@ -184,5 +185,46 @@
     "controversialDesc": "Feedback con reazioni negative — potrebbero richiedere attenzione.",
     "points": "punti",
     "scoring": "Punteggio"
+  },
+  "pricing": {
+    "badge": "Prezzi Semplici",
+    "title": "Scegli il tuo piano",
+    "subtitle": "Inizia gratis, fai upgrade quando ti serve. Nessun costo nascosto.",
+    "forever": "per sempre",
+    "perMonth": "/mese",
+    "currentPlan": "Piano attuale",
+    "popular": "Più Popolare",
+    "processing": "Elaborazione...",
+    
+    "freeName": "Free",
+    "freeDesc": "Perfetto per piccoli team che provano le retrospettive",
+    "free1": "Fino a 3 retro attive",
+    "free2": "Fino a 10 partecipanti per retro",
+    "free3": "Tutti i formati retro",
+    "free4": "Riassunti AI",
+    "free5": "Link validi 7 giorni",
+    "freeCta": "Inizia Gratis",
+    
+    "proName": "Pro",
+    "proDesc": "Per team che fanno retrospettive regolarmente",
+    "pro1": "Retro illimitate",
+    "pro2": "Partecipanti illimitati",
+    "pro3": "Tutti i formati retro",
+    "pro4": "Riassunti AI",
+    "pro5": "Export PDF",
+    "pro6": "Link permanenti & storico completo",
+    "proCta": "Passa a Pro",
+    
+    "faqTitle": "Domande Frequenti",
+    "faq1Q": "Posso cancellare quando voglio?",
+    "faq1A": "Sì! Cancella con un click dal tuo account. Manterrai l'accesso fino alla fine del periodo di fatturazione.",
+    "faq2Q": "Che metodi di pagamento accettate?",
+    "faq2A": "Accettiamo tutte le principali carte di credito, PayPal e Apple Pay tramite il nostro provider sicuro.",
+    "faq3Q": "Serve una carta di credito per il piano Free?",
+    "faq3A": "No. Il piano Free è completamente gratuito, nessuna carta richiesta.",
+    "faq4Q": "Posso cambiare piano?",
+    "faq4A": "Sì, upgrade o downgrade in qualsiasi momento. Gli upgrade sono immediati, i downgrade al prossimo ciclo di fatturazione.",
+    
+    "guarantee": "Garanzia soddisfatti o rimborsati 30 giorni. Nessuna domanda."
   }
 }
