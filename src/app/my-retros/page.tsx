@@ -54,10 +54,9 @@ export default function MyRetrosPage() {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold">{t('auth.myRetros')}</h1>
-            <Button asChild>
+            <Button asChild size="icon" className="h-10 w-10 rounded-full">
               <Link href="/create">
-                <Plus className="w-4 h-4 mr-2" />
-                {t('home.cta').replace(' — Free', '')}
+                <Plus className="w-5 h-5" strokeWidth={3} />
               </Link>
             </Button>
           </div>
