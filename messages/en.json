@@ -25,7 +25,10 @@
     "confirmationSent": "We sent a confirmation link to",
     "clickLink": "Click the link in the email to activate your account.",
     "logout": "Sign out",
-    "myRetros": "My Retros"
+    "myRetros": "My Retros",
+    "orContinueWith": "or continue with",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGithub": "Continue with GitHub"
   },
   "home": {
     "title": "RetroShift",

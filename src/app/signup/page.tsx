@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import Header from '@/components/Header'
+import OAuthButtons from '@/components/OAuthButtons'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -147,6 +148,10 @@ export default function SignupPage() {
                   {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
                 </Button>
               </form>
+
+              <div className="mt-6">
+                <OAuthButtons />
+              </div>
 
               <div className="mt-6 text-center text-sm">
                 <span className="text-muted-foreground">{t('auth.haveAccount')}</span>{' '}

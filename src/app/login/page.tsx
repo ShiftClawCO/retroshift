@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import Header from '@/components/Header'
+import OAuthButtons from '@/components/OAuthButtons'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -93,6 +94,10 @@ export default function LoginPage() {
                   {loading ? t('auth.loggingIn') : t('auth.login')}
                 </Button>
               </form>
+
+              <div className="mt-6">
+                <OAuthButtons redirectTo={redirectTo} />
+              </div>
 
               <div className="mt-6 text-center text-sm">
                 <span className="text-muted-foreground">{t('auth.noAccount')}</span>{' '}
