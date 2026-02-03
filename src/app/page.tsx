@@ -217,9 +217,9 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-12">{t('home.pricingTitle')}</h2>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto items-stretch">
             {/* Free */}
-            <Card>
+            <Card className="flex flex-col">
               <CardHeader>
                 <CardTitle>{t('home.pricingFreeTitle')}</CardTitle>
                 <div className="mt-2">
@@ -227,23 +227,24 @@ export default function Home() {
                   <span className="text-muted-foreground ml-2">{t('home.pricingFreePeriod')}</span>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2">
+              <CardContent className="flex-1 flex flex-col">
+                <ul className="space-y-2 flex-1">
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingFree1')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingFree2')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingFree3')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingFree4')}</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingFree5')}</li>
                 </ul>
-                <Button asChild className="w-full">
-                  <Link href="/create">{t('home.cta')}</Link>
+                <Button asChild className="w-full mt-6">
+                  <Link href="/create">{t('home.pricingFreeCta')}</Link>
                 </Button>
               </CardContent>
             </Card>
 
             {/* Pro */}
-            <Card className="border-primary relative">
+            <Card className="border-primary relative flex flex-col">
               <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-                {t('home.pricingProCta')}
+                {t('home.pricingPopular')}
               </Badge>
               <CardHeader>
                 <CardTitle>{t('home.pricingProTitle')}</CardTitle>
@@ -252,15 +253,15 @@ export default function Home() {
                   <span className="text-muted-foreground ml-1">{t('home.pricingProPeriod')}</span>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2">
+              <CardContent className="flex-1 flex flex-col">
+                <ul className="space-y-2 flex-1">
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingPro1')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingPro2')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingPro3')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingPro4')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingPro5')}</li>
                 </ul>
-                <Button asChild className="w-full">
+                <Button asChild className="w-full mt-6">
                   <Link href="/pricing">{t('home.pricingProCta')}</Link>
                 </Button>
               </CardContent>
