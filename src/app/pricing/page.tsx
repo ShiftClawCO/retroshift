@@ -121,7 +121,7 @@ export default function PricingPage() {
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           
           {/* Free Plan */}
-          <Card className={currentPlan === 'free' ? 'border-primary' : ''}>
+          <Card className={`flex flex-col ${currentPlan === 'free' ? 'border-primary' : ''}`}>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
@@ -138,8 +138,8 @@ export default function PricingPage() {
                 <span className="text-muted-foreground ml-2">{t('pricing.forever')}</span>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-3">
+            <CardContent className="flex flex-col flex-1">
+              <ul className="space-y-3 flex-1">
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-primary" />
                   <span>{t('pricing.free1')}</span>
@@ -162,20 +162,22 @@ export default function PricingPage() {
                 </li>
               </ul>
               
-              {currentPlan === 'free' ? (
-                <Button asChild className="w-full">
-                  <Link href="/create">{t('pricing.freeCta')}</Link>
-                </Button>
-              ) : (
-                <Button variant="outline" className="w-full" disabled>
-                  {t('pricing.freeCta')}
-                </Button>
-              )}
+              <div className="mt-6">
+                {currentPlan === 'free' ? (
+                  <Button asChild className="w-full">
+                    <Link href="/create">{t('pricing.freeCta')}</Link>
+                  </Button>
+                ) : (
+                  <Button variant="outline" className="w-full" disabled>
+                    {t('pricing.freeCta')}
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
           
           {/* Pro Plan */}
-          <Card className={`relative ${currentPlan === 'pro' ? 'border-primary' : 'border-primary/50'}`}>
+          <Card className={`relative flex flex-col ${currentPlan === 'pro' ? 'border-primary' : 'border-primary/50'}`}>
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
               <Badge className="gap-1">
                 <Crown className="w-3 h-3" />
@@ -199,8 +201,8 @@ export default function PricingPage() {
                 <span className="text-muted-foreground ml-1">{t('pricing.perMonth')}</span>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-3">
+            <CardContent className="flex flex-col flex-1">
+              <ul className="space-y-3 flex-1">
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-primary" />
                   <span>{t('pricing.pro1')}</span>
@@ -227,26 +229,28 @@ export default function PricingPage() {
                 </li>
               </ul>
               
-              {currentPlan === 'pro' ? (
-                <Button variant="outline" className="w-full" disabled>
-                  {t('pricing.currentPlan')}
-                </Button>
-              ) : (
-                <Button 
-                  className="w-full" 
-                  onClick={handleUpgrade}
-                  disabled={loading || checkoutLoading}
-                >
-                  {checkoutLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {t('pricing.processing')}
-                    </>
-                  ) : (
-                    t('pricing.proCta')
-                  )}
-                </Button>
-              )}
+              <div className="mt-6">
+                {currentPlan === 'pro' ? (
+                  <Button variant="outline" className="w-full" disabled>
+                    {t('pricing.currentPlan')}
+                  </Button>
+                ) : (
+                  <Button 
+                    className="w-full" 
+                    onClick={handleUpgrade}
+                    disabled={loading || checkoutLoading}
+                  >
+                    {checkoutLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        {t('pricing.processing')}
+                      </>
+                    ) : (
+                      t('pricing.proCta')
+                    )}
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
