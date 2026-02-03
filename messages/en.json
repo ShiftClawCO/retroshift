@@ -73,6 +73,7 @@
     
     "pricingTitle": "Simple pricing",
     "pricingFreeTitle": "Free",
+    "pricingFreeDesc": "Perfect to get started",
     "pricingFreePrice": "$0",
     "pricingFreePeriod": "forever",
     "pricingFree1": "3 active retros",
@@ -84,7 +85,8 @@
     "pricingPopular": "Most Popular",
     
     "pricingProTitle": "Pro",
-    "pricingProPrice": "$9",
+    "pricingProDesc": "For teams that run retros regularly",
+    "pricingProPrice": "€9",
     "pricingProPeriod": "/month",
     "pricingPro1": "Unlimited retros",
     "pricingPro2": "Unlimited participants",

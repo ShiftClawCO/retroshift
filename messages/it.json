@@ -73,6 +73,7 @@
     
     "pricingTitle": "Pricing semplice",
     "pricingFreeTitle": "Free",
+    "pricingFreeDesc": "Perfetto per iniziare",
     "pricingFreePrice": "€0",
     "pricingFreePeriod": "per sempre",
     "pricingFree1": "3 retro attive",
@@ -84,7 +85,8 @@
     "pricingPopular": "Più Popolare",
     
     "pricingProTitle": "Pro",
-    "pricingProPrice": "€8",
+    "pricingProDesc": "Per team che fanno retro regolarmente",
+    "pricingProPrice": "€9",
     "pricingProPeriod": "/mese",
     "pricingPro1": "Retro illimitate",
     "pricingPro2": "Partecipanti illimitati",

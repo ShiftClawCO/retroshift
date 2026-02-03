@@ -16,6 +16,8 @@ import {
   BarChart3,
   X,
   Check,
+  Crown,
+  Zap,
 } from 'lucide-react'
 
 export default function Home() {
@@ -217,18 +219,22 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-12">{t('home.pricingTitle')}</h2>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto items-stretch">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
             {/* Free */}
             <Card className="flex flex-col">
               <CardHeader>
-                <CardTitle>{t('home.pricingFreeTitle')}</CardTitle>
-                <div className="mt-2">
-                  <span className="text-4xl font-bold">{t('home.pricingFreePrice')}</span>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-muted-foreground" />
+                  {t('home.pricingFreeTitle')}
+                </CardTitle>
+                <CardDescription>{t('home.pricingFreeDesc')}</CardDescription>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold">€0</span>
                   <span className="text-muted-foreground ml-2">{t('home.pricingFreePeriod')}</span>
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
-                <ul className="space-y-2 flex-1">
+                <ul className="space-y-3 flex-1">
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingFree1')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingFree2')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingFree3')}</li>
@@ -242,19 +248,26 @@ export default function Home() {
             </Card>
 
             {/* Pro */}
-            <Card className="border-primary relative flex flex-col">
-              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-                {t('home.pricingPopular')}
-              </Badge>
+            <Card className="border-primary/50 relative flex flex-col">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <Badge className="gap-1">
+                  <Crown className="w-3 h-3" />
+                  {t('home.pricingPopular')}
+                </Badge>
+              </div>
               <CardHeader>
-                <CardTitle>{t('home.pricingProTitle')}</CardTitle>
-                <div className="mt-2">
-                  <span className="text-4xl font-bold">{t('home.pricingProPrice')}</span>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-primary" />
+                  {t('home.pricingProTitle')}
+                </CardTitle>
+                <CardDescription>{t('home.pricingProDesc')}</CardDescription>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold">€9</span>
                   <span className="text-muted-foreground ml-1">{t('home.pricingProPeriod')}</span>
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
-                <ul className="space-y-2 flex-1">
+                <ul className="space-y-3 flex-1">
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingPro1')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingPro2')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingPro3')}</li>
