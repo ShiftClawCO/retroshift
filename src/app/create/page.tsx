@@ -102,29 +102,32 @@ export default function CreateRetro() {
     setLoading(true)
     setError('')
 
-    const supabase = createClient()
-    
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    const { data, error: dbError } = await supabase
-      .from('retros')
-      .insert({
-        title: title.trim(),
-        format,
-        user_id: user?.id || null,
+    try {
+      const response = await fetch('/api/retros', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title.trim(), format }),
       })
-      .select()
-      .single()
 
-    if (dbError) {
-      console.error('Create retro error:', dbError)
+      const data = await response.json()
+
+      if (!response.ok) {
+        if (data.code === 'LIMIT_REACHED') {
+          setLimitReached(true)
+          setError(t('create.limitReached', { count: data.limit }))
+        } else {
+          setError(t('create.errorGeneric'))
+        }
+        setLoading(false)
+        return
+      }
+
+      router.push(`/dashboard/${data.retro.access_code}`)
+    } catch (err) {
+      console.error('Create retro error:', err)
       setError(t('create.errorGeneric'))
       setLoading(false)
-      return
     }
-
-    router.push(`/dashboard/${data.access_code}`)
   }
 
   return (
