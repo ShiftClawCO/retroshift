@@ -37,11 +37,11 @@
     "step3Title": "Collect feedback",
     "step3Desc": "See responses in real-time. Anonymous and honest.",
     
-    "comparisonTitle": "Why not use Miro or FunRetro?",
+    "comparisonTitle": "Why not use other tools?",
     "comparisonIntro": "You could. But...",
-    "comp1": "Miro costs $10/user/month and you don't need 90% of the features",
-    "comp2": "FunRetro requires accounts for everyone — friction kills participation",
-    "comp3": "Shared boards aren't anonymous — you see who writes what",
+    "comp1": "Enterprise tools cost $10+/user/month — and you don't need 90% of the features",
+    "comp2": "Most tools require accounts for everyone — friction kills participation",
+    "comp3": "Shared boards aren't truly anonymous — you can see who writes what",
     "comparisonConclusion": "RetroShift: one link, zero logins, real anonymity.",
     
     "pricingTitle": "Simple pricing",
