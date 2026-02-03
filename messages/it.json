@@ -211,18 +211,17 @@
     "free1": "Fino a 3 retro attive",
     "free2": "Fino a 10 partecipanti per retro",
     "free3": "Tutti i formati retro",
-    "free4": "Riassunti AI",
-    "free5": "Link validi 7 giorni",
+    "free4": "Link validi 7 giorni",
+    "free5": "Riassunti AI",
     "freeCta": "Inizia Gratis",
     
     "proName": "Pro",
     "proDesc": "Per team che fanno retrospettive regolarmente",
     "pro1": "Retro illimitate",
     "pro2": "Partecipanti illimitati",
-    "pro3": "Tutti i formati retro",
-    "pro4": "Riassunti AI",
-    "pro5": "Export PDF",
-    "pro6": "Link permanenti & storico completo",
+    "pro3": "Export PDF",
+    "pro4": "Storico completo",
+    "pro5": "Link permanenti",
     "proCta": "Passa a Pro",
     
     "faqTitle": "Domande Frequenti",
@@ -233,8 +232,6 @@
     "faq3Q": "Serve una carta di credito per il piano Free?",
     "faq3A": "No. Il piano Free è completamente gratuito, nessuna carta richiesta.",
     "faq4Q": "Posso cambiare piano?",
-    "faq4A": "Sì, upgrade o downgrade in qualsiasi momento. Gli upgrade sono immediati, i downgrade al prossimo ciclo di fatturazione.",
-    
-    "guarantee": "Garanzia soddisfatti o rimborsati 30 giorni. Nessuna domanda."
+    "faq4A": "Sì, upgrade o downgrade in qualsiasi momento. Gli upgrade sono immediati, i downgrade al prossimo ciclo di fatturazione."
   }
 }

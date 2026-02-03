@@ -223,10 +223,6 @@ export default function PricingPage() {
                   <Check className="w-4 h-4 text-primary" />
                   <span>{t('pricing.pro5')}</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-primary" />
-                  <span>{t('pricing.pro6')}</span>
-                </li>
               </ul>
               
               <div className="mt-6">
@@ -296,11 +292,6 @@ export default function PricingPage() {
               </CardContent>
             </Card>
           </div>
-        </div>
-        
-        {/* Money-back guarantee */}
-        <div className="text-center mt-12 text-muted-foreground">
-          <p>{t('pricing.guarantee')}</p>
         </div>
       </main>
     </div>

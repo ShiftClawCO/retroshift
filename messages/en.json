@@ -211,18 +211,17 @@
     "free1": "Up to 3 active retros",
     "free2": "Up to 10 participants per retro",
     "free3": "All retro formats",
-    "free4": "AI-powered summaries",
-    "free5": "Links valid for 7 days",
+    "free4": "Links valid for 7 days",
+    "free5": "AI-powered summaries",
     "freeCta": "Get Started Free",
     
     "proName": "Pro",
     "proDesc": "For teams running regular retrospectives",
     "pro1": "Unlimited retros",
     "pro2": "Unlimited participants",
-    "pro3": "All retro formats",
-    "pro4": "AI-powered summaries",
-    "pro5": "PDF export",
-    "pro6": "Permanent links & full history",
+    "pro3": "PDF export",
+    "pro4": "Full history",
+    "pro5": "Permanent links",
     "proCta": "Upgrade to Pro",
     
     "faqTitle": "Frequently Asked Questions",
@@ -233,8 +232,6 @@
     "faq3Q": "Do I need a credit card for the free plan?",
     "faq3A": "No. The free plan is completely free, no credit card required.",
     "faq4Q": "Can I switch between plans?",
-    "faq4A": "Yes, upgrade or downgrade anytime. Upgrades take effect immediately, downgrades at the next billing cycle.",
-    
-    "guarantee": "30-day money-back guarantee. No questions asked."
+    "faq4A": "Yes, upgrade or downgrade anytime. Upgrades take effect immediately, downgrades at the next billing cycle."
   }
 }
