@@ -67,19 +67,13 @@ export default function MyRetrosPage() {
               {t('common.loading')}
             </div>
           ) : retros.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-12">
-                <p className="text-muted-foreground mb-4">
-                  Non hai ancora creato nessuna retro.
-                </p>
-                <Button asChild>
-                  <Link href="/create">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Crea la tua prima Retro
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="flex justify-center py-16">
+              <Button asChild size="lg" className="h-20 w-20 rounded-full text-primary-foreground bg-primary hover:bg-primary/90 shadow-lg">
+                <Link href="/create">
+                  <Plus className="w-10 h-10" strokeWidth={3} />
+                </Link>
+              </Button>
+            </div>
           ) : (
             <div className="space-y-4">
               {retros.map((retro) => (
