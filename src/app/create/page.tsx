@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { supabase, FORMATS, FormatKey } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/client'
+import { FORMATS, FormatKey } from '@/lib/supabase'
 import { getCategoryConfig } from '@/lib/category-icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -52,16 +53,23 @@ export default function CreateRetro() {
     setLoading(true)
     setError('')
 
+    const supabase = createClient()
+    
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser()
+    
     const { data, error: dbError } = await supabase
       .from('retros')
       .insert({
         title: title.trim(),
         format,
+        user_id: user?.id || null,
       })
       .select()
       .single()
 
     if (dbError) {
+      console.error('Create retro error:', dbError)
       setError(t('create.errorGeneric'))
       setLoading(false)
       return

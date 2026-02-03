@@ -5,6 +5,28 @@
     "error": "Errore",
     "retry": "Riprova"
   },
+  "auth": {
+    "loginTitle": "Bentornato",
+    "loginSubtitle": "Accedi per gestire le tue retro",
+    "login": "Accedi",
+    "loggingIn": "Accesso...",
+    "signupTitle": "Crea account",
+    "signupSubtitle": "Inizia oggi a fare retro migliori",
+    "createAccount": "Crea Account",
+    "creatingAccount": "Creazione...",
+    "confirmPassword": "Conferma password",
+    "passwordMismatch": "Le password non coincidono",
+    "passwordTooShort": "La password deve essere di almeno 6 caratteri",
+    "noAccount": "Non hai un account?",
+    "signupLink": "Registrati",
+    "haveAccount": "Hai già un account?",
+    "loginLink": "Accedi",
+    "checkEmail": "Controlla la tua email",
+    "confirmationSent": "Abbiamo inviato un link di conferma a",
+    "clickLink": "Clicca il link nell'email per attivare il tuo account.",
+    "logout": "Esci",
+    "myRetros": "Le mie Retro"
+  },
   "home": {
     "title": "RetroShift",
     "heroTitle": "Le retrospettive in call sono imbarazzanti.",
