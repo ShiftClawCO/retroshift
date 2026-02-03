@@ -260,8 +260,8 @@ export default function Home() {
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingPro4')}</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {t('home.pricingPro5')}</li>
                 </ul>
-                <Button disabled variant="secondary" className="w-full">
-                  {t('home.pricingProCta')}
+                <Button asChild className="w-full">
+                  <Link href="/pricing">{t('home.pricingProCta')}</Link>
                 </Button>
               </CardContent>
             </Card>
