@@ -1,47 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useLocale, useTranslations } from 'next-intl'
+import { useLocale } from 'next-intl'
 import { ThemeToggle } from './theme-toggle'
 import LanguageSwitcher from './LanguageSwitcher'
-import { Button } from './ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
-import { createClient } from '@/lib/supabase/client'
-import { RotateCcw, User, LogOut, LayoutDashboard } from 'lucide-react'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { RotateCcw } from 'lucide-react'
 
 export default function Header() {
   const locale = useLocale()
-  const t = useTranslations()
-  const router = useRouter()
-  const [user, setUser] = useState<SupabaseUser | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const supabase = createClient()
-    
-    // Get initial user
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      setLoading(false)
-    })
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/')
-    router.refresh()
-  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -56,34 +22,6 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <LanguageSwitcher currentLocale={locale} />
           <ThemeToggle />
-          
-          {!loading && (
-            user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="ml-2">
-                    <User className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link href="/my-retros" className="flex items-center gap-2">
-                      <LayoutDashboard className="h-4 w-4" />
-                      {t('auth.myRetros')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2">
-                    <LogOut className="h-4 w-4" />
-                    {t('auth.logout')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button asChild variant="ghost" size="sm" className="ml-2">
-                <Link href="/login">{t('auth.login')}</Link>
-              </Button>
-            )
-          )}
         </div>
       </div>
     </header>
