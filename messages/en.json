@@ -27,8 +27,7 @@
     "logout": "Sign out",
     "myRetros": "My Retros",
     "orContinueWith": "or continue with",
-    "continueWithGoogle": "Continue with Google",
-    "continueWithGithub": "Continue with GitHub"
+    "continueWithGoogle": "Continue with Google"
   },
   "home": {
     "title": "RetroShift",
