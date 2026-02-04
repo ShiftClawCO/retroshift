@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import Header from '@/components/Header'
 import { createClient } from '@/lib/supabase/client'
 import { getCheckoutUrl } from '@/lib/lemonsqueezy'
-import { Check, Sparkles, Zap, Crown, Loader2 } from 'lucide-react'
+import { Check, Sparkles, Zap, Crown, Loader2, Bell } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 
 // LemonSqueezy Product Variant ID for Pro plan (€9/month)
@@ -22,6 +22,7 @@ export default function PricingPage() {
   const [loading, setLoading] = useState(true)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [currentPlan, setCurrentPlan] = useState<'free' | 'pro'>('free')
+  const [showComingSoon, setShowComingSoon] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -59,7 +60,7 @@ export default function PricingPage() {
     }
     
     if (!PRO_VARIANT_ID) {
-      alert('Checkout not yet configured. Coming soon!')
+      setShowComingSoon(true)
       return
     }
     
@@ -117,6 +118,21 @@ export default function PricingPage() {
           </p>
         </div>
         
+        {/* Coming Soon Banner */}
+        {showComingSoon && (
+          <div className="max-w-2xl mx-auto mb-8 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+            <div className="flex items-center gap-3">
+              <Bell className="w-5 h-5 text-primary" />
+              <div>
+                <p className="font-medium text-primary">Pro plan coming soon!</p>
+                <p className="text-sm text-muted-foreground">
+                  Start with the free plan today. We&apos;ll notify you when Pro is available.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           
