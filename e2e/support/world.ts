@@ -10,6 +10,8 @@ export interface CustomWorld extends World {
     email: string;
     id: string;
   };
+  init(): Promise<void>;
+  cleanup(): Promise<void>;
 }
 
 class PlaywrightWorld extends World implements CustomWorld {
