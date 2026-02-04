@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { supabase, Retro, Entry, Vote, FORMATS, FormatKey } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/client'
 import { getCategoryConfig } from '@/lib/category-icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,6 +31,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
+  const [isPro, setIsPro] = useState(false)
 
   const loadData = useCallback(async () => {
     const { data: retroData, error: retroError } = await supabase
@@ -45,6 +47,21 @@ export default function DashboardPage() {
     }
 
     setRetro(retroData)
+
+    // Check if current user is Pro
+    const authClient = createClient()
+    const { data: { user } } = await authClient.auth.getUser()
+    
+    if (user) {
+      const { data: subscription } = await supabase
+        .from('subscriptions')
+        .select('plan, status')
+        .eq('user_id', user.id)
+        .in('status', ['active', 'past_due'])
+        .single()
+      
+      setIsPro(subscription?.plan === 'pro')
+    }
 
     const { data: entriesData } = await supabase
       .from('entries')
@@ -263,7 +280,7 @@ export default function DashboardPage() {
         )}
 
         {/* AI Summary */}
-        <AISummary retroId={retro!.id} entries={entries} />
+        <AISummary retroId={retro!.id} entries={entries} isPro={isPro} />
 
         {/* Leaderboard */}
         <Leaderboard entries={entries} votes={votes} />

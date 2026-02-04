@@ -137,7 +137,9 @@
     "closedTitle": "Retro Closed",
     "closed": "This retro has ended. The team can no longer submit feedback.",
     "notFound": "Retro not found",
-    "createNew": "Create a new retro"
+    "createNew": "Create a new retro",
+    "linkExpired": "This retro link has expired. Free tier links are valid for 7 days.",
+    "participantLimit": "This retro has reached the maximum of 10 participants for the free tier."
   },
   "dashboard": {
     "feedbackCount": "{count} feedback received",
@@ -187,7 +189,9 @@
     "generating": "Generating...",
     "description": "Click to generate an AI summary of the feedback with key themes and suggested actions.",
     "upToDate": "Up to date",
-    "newFeedback": "New feedback"
+    "newFeedback": "New feedback",
+    "proFeature": "AI-powered summaries are available for Pro users.",
+    "upgradeToPro": "Upgrade to Pro"
   },
   "leaderboard": {
     "title": "Top Feedback",

@@ -137,7 +137,9 @@
     "closedTitle": "Retro Chiusa",
     "closed": "Questa retro è terminata. Il team non può più inviare feedback.",
     "notFound": "Retro non trovata",
-    "createNew": "Crea una nuova retro"
+    "createNew": "Crea una nuova retro",
+    "linkExpired": "Questo link retro è scaduto. I link del piano gratuito sono validi per 7 giorni.",
+    "participantLimit": "Questa retro ha raggiunto il massimo di 10 partecipanti per il piano gratuito."
   },
   "dashboard": {
     "feedbackCount": "{count} feedback ricevuti",
@@ -187,7 +189,9 @@
     "generating": "Generazione...",
     "description": "Clicca per generare un riassunto AI dei feedback con i temi principali e azioni suggerite.",
     "upToDate": "Aggiornato",
-    "newFeedback": "Nuovi feedback"
+    "newFeedback": "Nuovi feedback",
+    "proFeature": "I riassunti AI sono disponibili per gli utenti Pro.",
+    "upgradeToPro": "Passa a Pro"
   },
   "leaderboard": {
     "title": "Top Feedback",

@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { supabase, Retro, FORMATS, FormatKey } from '@/lib/supabase'
+import { supabase, Retro, FORMATS, FormatKey, getVoterId } from '@/lib/supabase'
 import { getCategoryConfig } from '@/lib/category-icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -77,25 +77,46 @@ export default function ParticipatePage() {
     setSubmitting(true)
     setError('')
 
-    const toInsert = Object.entries(entries)
+    const feedbackEntries = Object.entries(entries)
       .filter(([_, content]) => content.trim())
       .map(([category, content]) => ({
-        retro_id: retro!.id,
         category,
         content: content.trim()
       }))
 
-    const { error: dbError } = await supabase
-      .from('entries')
-      .insert(toInsert)
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          retroId: retro!.id,
+          entries: feedbackEntries,
+          participantId: getVoterId(), // Use same ID as for voting
+        }),
+      })
 
-    if (dbError) {
+      const data = await res.json()
+
+      if (!res.ok) {
+        // Handle specific errors
+        if (data.error === 'LINK_EXPIRED') {
+          setError(t('participate.linkExpired') || 'This link has expired.')
+        } else if (data.error === 'PARTICIPANT_LIMIT') {
+          setError(t('participate.participantLimit') || 'Maximum participants reached.')
+        } else if (data.error === 'RETRO_CLOSED') {
+          setError(t('participate.closed'))
+        } else {
+          setError(t('participate.errorGeneric'))
+        }
+        setSubmitting(false)
+        return
+      }
+
+      setSubmitted(true)
+    } catch (err) {
       setError(t('participate.errorGeneric'))
       setSubmitting(false)
-      return
     }
-
-    setSubmitted(true)
   }
 
   if (loading) {

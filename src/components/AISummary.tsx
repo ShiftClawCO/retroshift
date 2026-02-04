@@ -1,19 +1,21 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { Entry } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, RefreshCw, Check, Loader2, AlertCircle, Bot } from 'lucide-react'
+import { Sparkles, RefreshCw, Check, Loader2, AlertCircle, Bot, Lock, Crown } from 'lucide-react'
 
 interface AISummaryProps {
   retroId: string
   entries: Entry[]
+  isPro?: boolean
 }
 
-export default function AISummary({ retroId, entries }: AISummaryProps) {
+export default function AISummary({ retroId, entries, isPro = false }: AISummaryProps) {
   const t = useTranslations()
   const locale = useLocale()
   const [summary, setSummary] = useState<string | null>(null)
@@ -75,6 +77,43 @@ export default function AISummary({ retroId, entries }: AISummaryProps) {
 
   if (entries.length === 0) {
     return null
+  }
+
+  // Free tier teaser - show locked state
+  if (!isPro) {
+    return (
+      <Card className="mb-8 border-purple-500/30 bg-purple-500/5 relative overflow-hidden">
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px] z-10" />
+        <CardHeader className="relative z-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="w-5 h-5 text-purple-500" />
+                {t('summary.title')}
+              </CardTitle>
+              <Badge variant="outline" className="text-xs gap-1 border-amber-500 text-amber-500">
+                <Crown className="w-3 h-3" />
+                Pro
+              </Badge>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="relative z-0">
+          <div className="border border-dashed rounded-lg p-6 text-center">
+            <Lock className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
+            <p className="text-muted-foreground mb-4">
+              {t('summary.proFeature') || 'AI-powered summaries are available for Pro users.'}
+            </p>
+            <Button asChild size="sm">
+              <Link href="/pricing">
+                <Crown className="w-4 h-4 mr-2" />
+                {t('summary.upgradeToPro') || 'Upgrade to Pro'}
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
