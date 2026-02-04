@@ -38,12 +38,12 @@ CREATE INDEX IF NOT EXISTS idx_subscriptions_lemon_squeezy_id ON subscriptions(l
 -- Enable RLS
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 
--- Policies
--- Users can only read their own subscription
+-- Policies (idempotent)
+DROP POLICY IF EXISTS "Users can read own subscription" ON subscriptions;
 CREATE POLICY "Users can read own subscription" ON subscriptions
   FOR SELECT USING (auth.uid() = user_id);
 
--- Only service role can insert/update (via webhooks)
+DROP POLICY IF EXISTS "Service role can manage subscriptions" ON subscriptions;
 CREATE POLICY "Service role can manage subscriptions" ON subscriptions
   FOR ALL USING (auth.role() = 'service_role');
 
