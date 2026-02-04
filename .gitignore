@@ -43,3 +43,4 @@ supabase/.temp
 
 # Auto Claude data directory
 .auto-claude/
+.env*.local
