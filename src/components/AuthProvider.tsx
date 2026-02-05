@@ -23,6 +23,10 @@ export function useAuth() {
   return useContext(AuthContext)
 }
 
+/**
+ * Provides WorkOS user context. Must be ABOVE ConvexClientProvider
+ * so that useConvexAuth() can read the auth state.
+ */
 export function AuthProvider({ 
   children,
   workosUser 
@@ -30,12 +34,24 @@ export function AuthProvider({
   children: ReactNode
   workosUser: User | null 
 }) {
+  return (
+    <AuthContext.Provider value={{ user: workosUser, isLoading: false }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+/**
+ * Syncs the WorkOS user to Convex. Must be BELOW ConvexClientProvider
+ * (needs useMutation) and BELOW AuthProvider (needs useAuth).
+ */
+export function UserSync() {
+  const { user: workosUser } = useAuth()
   const [synced, setSynced] = useState(false)
   const syncUser = useMutation(api.users.upsert)
 
   useEffect(() => {
     if (workosUser && !synced) {
-      // Sync user to Convex
       syncUser({
         workosId: workosUser.id,
         email: workosUser.email,
@@ -46,9 +62,5 @@ export function AuthProvider({
     }
   }, [workosUser, synced, syncUser])
 
-  return (
-    <AuthContext.Provider value={{ user: workosUser, isLoading: false }}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return null
 }

@@ -5,7 +5,7 @@ import { getLocale, getMessages } from 'next-intl/server';
 import { getUser } from '@/lib/auth';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ConvexClientProvider } from '@/components/ConvexClientProvider';
-import { AuthProvider } from '@/components/AuthProvider';
+import { AuthProvider, UserSync } from '@/components/AuthProvider';
 import { Toaster } from '@/components/ui/sonner';
 import "./globals.css";
 
@@ -75,13 +75,14 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ConvexClientProvider>
-            <AuthProvider workosUser={workosUser}>
+          <AuthProvider workosUser={workosUser}>
+            <ConvexClientProvider>
+              <UserSync />
               <NextIntlClientProvider messages={messages}>
                 {children}
               </NextIntlClientProvider>
-            </AuthProvider>
-          </ConvexClientProvider>
+            </ConvexClientProvider>
+          </AuthProvider>
           <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>

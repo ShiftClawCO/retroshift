@@ -23,9 +23,14 @@ SaaS for async retrospectives. Teams create retros, participants add entries and
 - Stripe: webhook → @src/app/api/stripe/webhook/route.ts → @convex/stripe.ts (bridge) → internal mutations
 - Schema: @convex/schema.ts
 
-## Team
-This project is built by Shiftclaw. Sub-agents are defined in @.claude/agents/
-Development rules are in @.claude/rules/
+## Team — DELEGATE!
+You have specialized sub-agents. Use them for all substantial work:
+- 🦑 **Ink** → coding (features, bugs, refactoring) — `--agent ink`
+- 🦔 **Spike** → QA (review, security, tests) — `--agent spike`
+- 🪸 **Coral** → marketing (copy, SEO) — `--agent coral`
+- 🦪 **Pearl** → UX (layout, accessibility) — `--agent pearl`
+
+Coding task? Delegate to Ink. Need review? Delegate to Spike. Don't do it all yourself.
 
 ## Important
 - Work on `dev` branch only. Never `main`.
