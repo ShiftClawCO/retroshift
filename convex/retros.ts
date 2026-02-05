@@ -54,6 +54,10 @@ export const list = query({
 export const listByWorkosId = query({
   args: { workosId: v.string() },
   handler: async (ctx, args) => {
+    // Verify the caller's identity matches the requested workosId
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || identity.subject !== args.workosId) return [];
+
     const user = await ctx.db
       .query("users")
       .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))
@@ -80,11 +84,24 @@ export const getByCode = query({
   },
 });
 
-// Get retro by ID
+// Get retro by ID (owner-only)
 export const getById = query({
   args: { id: v.id("retros") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_workos_id", (q) => q.eq("workosId", identity.subject))
+      .first();
+
+    if (!user) return null;
+
+    const retro = await ctx.db.get(args.id);
+    if (!retro || retro.userId !== user._id) return null;
+
+    return retro;
   },
 });
 
@@ -116,6 +133,10 @@ export const countByUser = query({
 export const countByUserWorkosId = query({
   args: { workosId: v.string() },
   handler: async (ctx, args) => {
+    // Verify the caller's identity matches the requested workosId
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || identity.subject !== args.workosId) return 0;
+
     const user = await ctx.db
       .query("users")
       .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))
@@ -141,6 +162,12 @@ export const createWithWorkosId = mutation({
     format: v.string(),
   },
   handler: async (ctx, args) => {
+    // Verify the caller's identity matches the requested workosId
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || identity.subject !== args.workosId) {
+      throw new Error("Not authenticated");
+    }
+
     const user = await ctx.db
       .query("users")
       .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))

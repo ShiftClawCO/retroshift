@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap } from 'lucide-react';
+import EmailSignInForm from '@/components/EmailSignInForm';
 
 export default async function SignupPage() {
   const signInUrl = await getSignInUrl();
@@ -43,6 +44,19 @@ export default async function SignupPage() {
               Sign up with Google
             </a>
           </Button>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">or</span>
+            </div>
+          </div>
+
+          {/* Email sign-up form */}
+          <EmailSignInForm signInUrl={signInUrl} />
           
           <ul className="text-sm text-muted-foreground space-y-2 mt-4">
             <li className="flex items-center gap-2">

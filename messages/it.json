@@ -30,7 +30,10 @@
     "noRetrosYet": "Nessuna retro ancora. Clicca + per creare la prima.",
     "pricing": "Prezzi",
     "orContinueWith": "oppure continua con",
-    "continueWithGoogle": "Continua con Google"
+    "continueWithGoogle": "Continua con Google",
+    "continueWithEmail": "Continua con email",
+    "emailPlaceholder": "nome@esempio.com",
+    "or": "oppure"
   },
   "home": {
     "title": "RetroShift",
@@ -153,7 +156,9 @@
     "copy": "Copia",
     "noFeedback": "Nessun feedback ancora",
     "responses": "{count} risposte",
-    "autoRefresh": "I nuovi feedback appariranno automaticamente"
+    "autoRefresh": "I nuovi feedback appariranno automaticamente",
+    "accessDenied": "Accesso negato",
+    "accessDeniedDesc": "Non hai i permessi per visualizzare questa retrospettiva."
   },
   "formats": {
     "start-stop-continue": {

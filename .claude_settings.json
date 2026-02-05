@@ -1,0 +1,29 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Users/shiftclaw/.openclaw/workspace/retroshift/**)",
+      "Write(/Users/shiftclaw/.openclaw/workspace/retroshift/**)",
+      "Edit(/Users/shiftclaw/.openclaw/workspace/retroshift/**)",
+      "Glob(/Users/shiftclaw/.openclaw/workspace/retroshift/**)",
+      "Grep(/Users/shiftclaw/.openclaw/workspace/retroshift/**)",
+      "Read(/Users/shiftclaw/.openclaw/workspace/retroshift/.auto-claude/specs/001-workos-authentication-login-signup/**)",
+      "Write(/Users/shiftclaw/.openclaw/workspace/retroshift/.auto-claude/specs/001-workos-authentication-login-signup/**)",
+      "Edit(/Users/shiftclaw/.openclaw/workspace/retroshift/.auto-claude/specs/001-workos-authentication-login-signup/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)"
+    ]
+  }
+}
