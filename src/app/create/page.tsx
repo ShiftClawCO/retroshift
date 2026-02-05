@@ -90,8 +90,8 @@ export default function CreateRetro() {
 
       // Redirect to the dashboard with the access code
       router.push(`/dashboard/${result.accessCode}`)
-    } catch (err: any) {
-      const errorMessage = err?.message || ''
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : ''
       
       if (errorMessage === 'RETRO_LIMIT_REACHED') {
         setError(t('create.limitReached', { count: FREE_RETRO_LIMIT }))

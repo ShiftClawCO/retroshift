@@ -72,8 +72,8 @@ export default function ParticipatePage() {
         participantId: getParticipantId(),
       })
       setSubmitted(true)
-    } catch (err: any) {
-      const errorMessage = err?.message || ''
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : ''
       
       if (errorMessage === 'LINK_EXPIRED') {
         setError(t('participate.linkExpired') || 'This link has expired.')
