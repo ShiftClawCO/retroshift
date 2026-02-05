@@ -20,18 +20,36 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RetroShift - Retrospettive Anonime per Team Agile",
-  description: "Crea retrospettive anonime e asincrone per il tuo team. Niente silenzi imbarazzanti, solo feedback onesto.",
-  keywords: ["retrospettiva", "agile", "scrum", "team", "feedback", "anonimo"],
+  title: {
+    default: "RetroShift — Anonymous Async Retrospectives for Agile Teams",
+    template: "%s | RetroShift",
+  },
+  description: "Run anonymous, async retrospectives your team will actually enjoy. No awkward silences — just honest feedback. Free to start.",
+  keywords: [
+    "retrospective", "agile", "scrum", "team", "feedback", "anonymous",
+    "async retrospective", "sprint retrospective", "remote team",
+    "retrospettiva", "anonimo", "team agile",
+  ],
+  metadataBase: new URL("https://retroshift.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "RetroShift - Retrospettive Anonime per Team Agile",
-    description: "Crea retrospettive anonime e asincrone per il tuo team.",
+    title: "RetroShift — Anonymous Async Retrospectives",
+    description: "Run anonymous, async retrospectives your team will actually enjoy. No awkward silences — just honest feedback.",
     type: "website",
+    url: "https://retroshift.vercel.app",
+    siteName: "RetroShift",
   },
   twitter: {
     card: "summary_large_image",
-    title: "RetroShift",
-    description: "Retrospettive anonime e asincrone per team agile.",
+    title: "RetroShift — Anonymous Async Retrospectives",
+    description: "Run anonymous, async retrospectives your team will actually enjoy. Free to start.",
+    creator: "@ShiftclawC",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
