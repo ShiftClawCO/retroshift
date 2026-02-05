@@ -6,6 +6,7 @@ import { getUser } from '@/lib/auth';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ConvexClientProvider } from '@/components/ConvexClientProvider';
 import { AuthProvider } from '@/components/AuthProvider';
+import { Toaster } from '@/components/ui/sonner';
 import "./globals.css";
 
 const nunitoSans = Nunito_Sans({
@@ -63,6 +64,7 @@ export default async function RootLayout({
               </NextIntlClientProvider>
             </AuthProvider>
           </ConvexClientProvider>
+          <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>
     </html>
