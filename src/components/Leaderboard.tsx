@@ -2,9 +2,9 @@
 
 import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
-import { Entry, Vote, VOTE_SCORES } from '@/lib/supabase'
+import { Entry, Vote } from '@/lib/types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Trophy, Medal, Award, AlertTriangle, ThumbsUp, Flame, Lightbulb, ThumbsDown } from 'lucide-react'
+import { Trophy, Medal, Award, AlertTriangle, ThumbsUp, ThumbsDown } from 'lucide-react'
 
 interface LeaderboardProps {
   entries: Entry[]
@@ -14,7 +14,8 @@ interface LeaderboardProps {
 interface ScoredEntry {
   entry: Entry
   score: number
-  voteBreakdown: Record<string, number>
+  upvotes: number
+  downvotes: number
   totalVotes: number
 }
 
@@ -23,17 +24,19 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
 
   const { topEntries, controversialEntries } = useMemo(() => {
     const scored: ScoredEntry[] = entries.map(entry => {
-      const entryVotes = votes.filter(v => v.entry_id === entry.id)
+      const entryVotes = votes.filter(v => v.entryId === entry._id)
       
-      const voteBreakdown: Record<string, number> = {}
-      let score = 0
+      let upvotes = 0
+      let downvotes = 0
       
       for (const vote of entryVotes) {
-        voteBreakdown[vote.emoji] = (voteBreakdown[vote.emoji] || 0) + 1
-        score += VOTE_SCORES[vote.emoji] || 0
+        if (vote.value > 0) upvotes++
+        else if (vote.value < 0) downvotes++
       }
       
-      return { entry, score, voteBreakdown, totalVotes: entryVotes.length }
+      const score = upvotes - downvotes
+      
+      return { entry, score, upvotes, downvotes, totalVotes: entryVotes.length }
     })
 
     const top = scored
@@ -42,7 +45,7 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
       .slice(0, 5)
 
     const controversial = scored
-      .filter(s => s.score < 0 || (s.voteBreakdown['👎'] && s.voteBreakdown['👎'] > 0))
+      .filter(s => s.score < 0 || s.downvotes > 0)
       .sort((a, b) => a.score - b.score)
       .slice(0, 3)
 
@@ -62,16 +65,6 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
     }
   }
 
-  const getVoteIcon = (emoji: string) => {
-    switch (emoji) {
-      case '👍': return <ThumbsUp className="w-3.5 h-3.5" />
-      case '🔥': return <Flame className="w-3.5 h-3.5" />
-      case '💡': return <Lightbulb className="w-3.5 h-3.5" />
-      case '👎': return <ThumbsDown className="w-3.5 h-3.5" />
-      default: return null
-    }
-  }
-
   return (
     <div className="space-y-6 mb-8">
       {/* Top Feedback */}
@@ -86,7 +79,7 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
           <CardContent className="space-y-3">
             {topEntries.map((item, index) => (
               <div 
-                key={item.entry.id}
+                key={item.entry._id}
                 className={`flex items-start gap-3 p-3 rounded-lg ${
                   index === 0 
                     ? 'bg-amber-500/10 border border-amber-500/30' 
@@ -106,12 +99,18 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
                     </span>
                     
                     <div className="flex gap-2 text-xs text-muted-foreground">
-                      {Object.entries(item.voteBreakdown).map(([emoji, count]) => (
-                        <span key={emoji} className="flex items-center gap-0.5">
-                          {getVoteIcon(emoji)}
-                          {count}
+                      {item.upvotes > 0 && (
+                        <span className="flex items-center gap-0.5">
+                          <ThumbsUp className="w-3.5 h-3.5" />
+                          {item.upvotes}
                         </span>
-                      ))}
+                      )}
+                      {item.downvotes > 0 && (
+                        <span className="flex items-center gap-0.5">
+                          <ThumbsDown className="w-3.5 h-3.5" />
+                          {item.downvotes}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -134,7 +133,7 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
           <CardContent className="space-y-3">
             {controversialEntries.map((item) => (
               <div 
-                key={item.entry.id}
+                key={item.entry._id}
                 className="flex items-start gap-3 p-3 rounded-lg bg-destructive/5 border border-destructive/20"
               >
                 <div className="shrink-0 mt-0.5">
@@ -150,12 +149,18 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
                     </span>
                     
                     <div className="flex gap-2 text-xs text-muted-foreground">
-                      {Object.entries(item.voteBreakdown).map(([emoji, count]) => (
-                        <span key={emoji} className="flex items-center gap-0.5">
-                          {getVoteIcon(emoji)}
-                          {count}
+                      {item.upvotes > 0 && (
+                        <span className="flex items-center gap-0.5">
+                          <ThumbsUp className="w-3.5 h-3.5" />
+                          {item.upvotes}
                         </span>
-                      ))}
+                      )}
+                      {item.downvotes > 0 && (
+                        <span className="flex items-center gap-0.5">
+                          <ThumbsDown className="w-3.5 h-3.5" />
+                          {item.downvotes}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -169,8 +174,6 @@ export default function Leaderboard({ entries, votes }: LeaderboardProps) {
       <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
         <span>{t('leaderboard.scoring')}:</span>
         <span className="flex items-center gap-1"><ThumbsUp className="w-3.5 h-3.5" /> +1</span>
-        <span className="flex items-center gap-1"><Flame className="w-3.5 h-3.5" /> +2</span>
-        <span className="flex items-center gap-1"><Lightbulb className="w-3.5 h-3.5" /> +1</span>
         <span className="flex items-center gap-1"><ThumbsDown className="w-3.5 h-3.5" /> -1</span>
       </div>
     </div>

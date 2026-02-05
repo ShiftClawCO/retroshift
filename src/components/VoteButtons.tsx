@@ -1,80 +1,51 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase, Vote, VOTE_EMOJIS, VoteEmoji, getVoterId } from '@/lib/supabase'
-import { ThumbsUp, Flame, Lightbulb, ThumbsDown, LucideIcon } from 'lucide-react'
+import { useMutation } from 'convex/react'
+import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
+import { Vote, getParticipantId } from '@/lib/types'
+import { ThumbsUp, ThumbsDown } from 'lucide-react'
 
 interface VoteButtonsProps {
-  entryId: string
+  entryId: Id<"entries">
   initialVotes: Vote[]
-  onVoteChange?: (votes: Vote[]) => void
 }
 
-const VOTE_ICONS: Record<VoteEmoji, LucideIcon> = {
-  '👍': ThumbsUp,
-  '🔥': Flame,
-  '💡': Lightbulb,
-  '👎': ThumbsDown,
-}
-
-export default function VoteButtons({ entryId, initialVotes, onVoteChange }: VoteButtonsProps) {
-  const [votes, setVotes] = useState<Vote[]>(initialVotes)
-  const [voterId, setVoterId] = useState<string>('')
-  const [loading, setLoading] = useState<VoteEmoji | null>(null)
+export default function VoteButtons({ entryId, initialVotes }: VoteButtonsProps) {
+  const [participantId, setParticipantId] = useState<string>('')
+  const [loading, setLoading] = useState<'up' | 'down' | null>(null)
+  
+  const upsertVote = useMutation(api.votes.upsert)
 
   useEffect(() => {
-    setVoterId(getVoterId())
+    setParticipantId(getParticipantId())
   }, [])
 
-  // Update when initialVotes change
-  useEffect(() => {
-    setVotes(initialVotes)
-  }, [initialVotes])
+  // Calculate totals from votes
+  const upvotes = initialVotes.filter(v => v.value > 0).length
+  const downvotes = initialVotes.filter(v => v.value < 0).length
+  
+  // Check if current user has voted
+  const myVote = initialVotes.find(v => v.participantId === participantId)
+  const hasUpvoted = myVote?.value === 1
+  const hasDownvoted = myVote?.value === -1
 
-  const getVoteCount = (emoji: VoteEmoji) => {
-    return votes.filter(v => v.emoji === emoji).length
-  }
+  const handleVote = async (value: 1 | -1) => {
+    if (!participantId || loading) return
 
-  const hasVoted = (emoji: VoteEmoji) => {
-    return votes.some(v => v.emoji === emoji && v.voter_id === voterId)
-  }
-
-  const toggleVote = async (emoji: VoteEmoji) => {
-    if (!voterId || loading) return
-
-    setLoading(emoji)
-
-    const existingVote = votes.find(v => v.emoji === emoji && v.voter_id === voterId)
+    const isUpvote = value === 1
+    setLoading(isUpvote ? 'up' : 'down')
 
     try {
-      if (existingVote) {
-        const { error } = await supabase
-          .from('votes')
-          .delete()
-          .eq('id', existingVote.id)
-
-        if (!error) {
-          const newVotes = votes.filter(v => v.id !== existingVote.id)
-          setVotes(newVotes)
-          onVoteChange?.(newVotes)
-        }
-      } else {
-        const { data, error } = await supabase
-          .from('votes')
-          .insert({
-            entry_id: entryId,
-            emoji,
-            voter_id: voterId,
-          })
-          .select()
-          .single()
-
-        if (!error && data) {
-          const newVotes = [...votes, data]
-          setVotes(newVotes)
-          onVoteChange?.(newVotes)
-        }
-      }
+      // If clicking same vote, toggle off (send 0)
+      const newValue = (isUpvote && hasUpvoted) || (!isUpvote && hasDownvoted) ? 0 : value
+      
+      await upsertVote({
+        entryId,
+        participantId,
+        value: newValue,
+      })
     } catch (err) {
       console.error('Vote error:', err)
     }
@@ -82,18 +53,13 @@ export default function VoteButtons({ entryId, initialVotes, onVoteChange }: Vot
     setLoading(null)
   }
 
-  // Get styling based on vote type
-  const getButtonStyle = (emoji: VoteEmoji, voted: boolean, count: number) => {
+  const getButtonStyle = (type: 'up' | 'down', isActive: boolean, count: number) => {
     const baseStyle = 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm transition-all duration-200 font-medium'
     
-    if (voted) {
-      switch (emoji) {
-        case '👍': return `${baseStyle} bg-emerald-600 text-white shadow-md shadow-emerald-500/30`
-        case '🔥': return `${baseStyle} bg-orange-600 text-white shadow-md shadow-orange-500/30`
-        case '💡': return `${baseStyle} bg-amber-500 text-white shadow-md shadow-amber-500/30`
-        case '👎': return `${baseStyle} bg-red-600 text-white shadow-md shadow-red-500/30`
-        default: return `${baseStyle} bg-slate-600 text-white`
-      }
+    if (isActive) {
+      return type === 'up'
+        ? `${baseStyle} bg-emerald-600 text-white shadow-md shadow-emerald-500/30`
+        : `${baseStyle} bg-red-600 text-white shadow-md shadow-red-500/30`
     }
     
     if (count > 0) {
@@ -105,30 +71,37 @@ export default function VoteButtons({ entryId, initialVotes, onVoteChange }: Vot
 
   return (
     <div className="flex flex-wrap gap-1.5 mt-3">
-      {VOTE_EMOJIS.map((emoji) => {
-        const count = getVoteCount(emoji)
-        const voted = hasVoted(emoji)
-        const IconComponent = VOTE_ICONS[emoji]
-        
-        return (
-          <button
-            key={emoji}
-            onClick={() => toggleVote(emoji)}
-            disabled={loading === emoji}
-            className={`${getButtonStyle(emoji, voted, count)} ${
-              loading === emoji ? 'opacity-50 cursor-wait' : 'cursor-pointer'
-            }`}
-            title={emoji === '👍' ? 'Good' : emoji === '🔥' ? 'Hot' : emoji === '💡' ? 'Idea' : 'Issue'}
-          >
-            <IconComponent className="w-4 h-4" />
-            {count > 0 && (
-              <span className={`text-xs ${voted ? 'text-white/90' : 'text-slate-400'}`}>
-                {count}
-              </span>
-            )}
-          </button>
-        )
-      })}
+      <button
+        onClick={() => handleVote(1)}
+        disabled={loading === 'up'}
+        className={`${getButtonStyle('up', hasUpvoted, upvotes)} ${
+          loading === 'up' ? 'opacity-50 cursor-wait' : 'cursor-pointer'
+        }`}
+        title="Upvote"
+      >
+        <ThumbsUp className="w-4 h-4" />
+        {upvotes > 0 && (
+          <span className={`text-xs ${hasUpvoted ? 'text-white/90' : 'text-slate-400'}`}>
+            {upvotes}
+          </span>
+        )}
+      </button>
+      
+      <button
+        onClick={() => handleVote(-1)}
+        disabled={loading === 'down'}
+        className={`${getButtonStyle('down', hasDownvoted, downvotes)} ${
+          loading === 'down' ? 'opacity-50 cursor-wait' : 'cursor-pointer'
+        }`}
+        title="Downvote"
+      >
+        <ThumbsDown className="w-4 h-4" />
+        {downvotes > 0 && (
+          <span className={`text-xs ${hasDownvoted ? 'text-white/90' : 'text-slate-400'}`}>
+            {downvotes}
+          </span>
+        )}
+      </button>
     </div>
   )
 }

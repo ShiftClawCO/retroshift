@@ -131,7 +131,7 @@ export const create = mutation({
     }
 
     const now = Date.now();
-    return await ctx.db.insert("retros", {
+    const retroId = await ctx.db.insert("retros", {
       userId: user._id,
       title: args.title,
       format: args.format,
@@ -140,6 +140,9 @@ export const create = mutation({
       createdAt: now,
       updatedAt: now,
     });
+
+    // Return the full retro object with accessCode for redirect
+    return { retroId, accessCode };
   },
 });
 

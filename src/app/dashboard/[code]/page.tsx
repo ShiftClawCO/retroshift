@@ -1,15 +1,15 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
-import { supabase, Retro, Entry, Vote, FORMATS, FormatKey } from '@/lib/supabase'
-import { createClient } from '@/lib/supabase/client'
+import { useQuery, useMutation } from 'convex/react'
+import { api } from '../../../../convex/_generated/api'
+import { FORMATS, FormatKey, type Entry, type Vote } from '@/lib/types'
 import { getCategoryConfig } from '@/lib/category-icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Lock, LockOpen, Link2, Check, Share2 } from 'lucide-react'
 import Header from '@/components/Header'
@@ -24,157 +24,47 @@ export default function DashboardPage() {
   const code = params.code as string
   const t = useTranslations()
   const locale = useLocale()
-  
-  const [retro, setRetro] = useState<Retro | null>(null)
-  const [entries, setEntries] = useState<Entry[]>([])
-  const [votes, setVotes] = useState<Vote[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+
   const [copied, setCopied] = useState(false)
-  const [isPro, setIsPro] = useState(false)
 
-  const loadData = useCallback(async () => {
-    const { data: retroData, error: retroError } = await supabase
-      .from('retros')
-      .select('*')
-      .eq('access_code', code)
-      .single()
+  // Convex queries
+  const retro = useQuery(api.retros.getByCode, { code })
+  const user = useQuery(api.users.getCurrent)
+  const entries = useQuery(
+    api.entries.listByRetro,
+    retro ? { retroId: retro._id } : "skip"
+  )
+  const allVotes = useQuery(
+    api.votes.listByEntries,
+    entries && entries.length > 0
+      ? { entryIds: entries.map(e => e._id) }
+      : "skip"
+  )
 
-    if (retroError || !retroData) {
-      setError(t('participate.notFound'))
-      setLoading(false)
-      return null
-    }
+  // Convex mutations
+  const toggleCloseMutation = useMutation(api.retros.toggleClose)
 
-    setRetro(retroData)
+  // Loading state
+  const loading = retro === undefined
 
-    // Check if current user is Pro
-    const authClient = createClient()
-    const { data: { user } } = await authClient.auth.getUser()
-    
-    if (user) {
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('plan, status')
-        .eq('user_id', user.id)
-        .in('status', ['active', 'past_due'])
-        .single()
-      
-      setIsPro(subscription?.plan === 'pro')
-    }
+  // Check if user is Pro
+  const isPro = user?.plan === 'pro'
 
-    const { data: entriesData } = await supabase
-      .from('entries')
-      .select('*')
-      .eq('retro_id', retroData.id)
-      .order('created_at', { ascending: true })
-
-    setEntries(entriesData || [])
-
-    if (entriesData && entriesData.length > 0) {
-      const entryIds = entriesData.map(e => e.id)
-      const { data: votesData } = await supabase
-        .from('votes')
-        .select('*')
-        .in('entry_id', entryIds)
-      
-      setVotes(votesData || [])
-    }
-
-    setLoading(false)
-    return retroData
-  }, [code, t])
-
-  useEffect(() => {
-    let channel: ReturnType<typeof supabase.channel> | null = null
-    let pollInterval: NodeJS.Timeout | null = null
-
-    const setup = async () => {
-      const retroData = await loadData()
-      
-      if (retroData) {
-        channel = supabase
-          .channel(`entries-${retroData.id}`)
-          .on(
-            'postgres_changes',
-            {
-              event: 'INSERT',
-              schema: 'public',
-              table: 'entries',
-              filter: `retro_id=eq.${retroData.id}`,
-            },
-            (payload) => {
-              setEntries(prev => {
-                if (prev.some(e => e.id === (payload.new as Entry).id)) return prev
-                return [...prev, payload.new as Entry]
-              })
-            }
-          )
-          .subscribe((status) => {
-            console.log('Realtime status:', status)
-          })
-
-        pollInterval = setInterval(async () => {
-          const { data: entriesData } = await supabase
-            .from('entries')
-            .select('*')
-            .eq('retro_id', retroData.id)
-            .order('created_at', { ascending: true })
-          
-          if (entriesData) {
-            setEntries(prev => {
-              if (entriesData.length !== prev.length) {
-                return entriesData
-              }
-              return prev
-            })
-          }
-        }, 5000)
-      }
-    }
-
-    setup()
-
-    return () => {
-      if (channel) {
-        supabase.removeChannel(channel)
-      }
-      if (pollInterval) {
-        clearInterval(pollInterval)
-      }
-    }
-  }, [loadData])
-
-  const copyShareLink = () => {
+  const copyShareLink = useCallback(() => {
     const url = `${window.location.origin}/r/${code}`
     navigator.clipboard.writeText(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }
+  }, [code])
 
-  const toggleClose = async () => {
+  const toggleClose = useCallback(async () => {
     if (!retro) return
-    
-    const { error: updateError } = await supabase
-      .from('retros')
-      .update({ is_closed: !retro.is_closed })
-      .eq('id', retro.id)
-
-    if (!updateError) {
-      setRetro(prev => prev ? { ...prev, is_closed: !prev.is_closed } : null)
+    try {
+      await toggleCloseMutation({ id: retro._id })
+    } catch (err) {
+      console.error('Error toggling retro:', err)
     }
-  }
-
-  const getVotesForEntry = (entryId: string) => {
-    return votes.filter(v => v.entry_id === entryId)
-  }
-
-  const handleVoteChange = (entryId: string, newVotes: Vote[]) => {
-    setVotes(prev => {
-      const otherVotes = prev.filter(v => v.entry_id !== entryId)
-      return [...otherVotes, ...newVotes]
-    })
-  }
+  }, [retro, toggleCloseMutation])
 
   // Keyboard shortcuts
   useKeyboardShortcuts([
@@ -195,12 +85,12 @@ export default function DashboardPage() {
     )
   }
 
-  if (error) {
+  if (!retro) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="text-center p-6">
           <CardContent>
-            <div className="text-destructive mb-4">{error}</div>
+            <div className="text-destructive mb-4">{t('participate.notFound')}</div>
             <Button asChild variant="outline">
               <Link href="/">{t('common.backHome')}</Link>
             </Button>
@@ -210,16 +100,23 @@ export default function DashboardPage() {
     )
   }
 
-  const format = FORMATS[retro!.format as FormatKey]
+  const format = FORMATS[retro.format as FormatKey]
+  const entriesList = entries || []
+  const votesList = allVotes || []
+
   const entriesByCategory = format.categories.reduce((acc, cat) => {
-    acc[cat] = entries.filter(e => e.category === cat)
+    acc[cat] = entriesList.filter(e => e.category === cat)
     return acc
   }, {} as Record<string, Entry[]>)
+
+  const getVotesForEntry = (entryId: string) => {
+    return votesList.filter(v => v.entryId === entryId) as Vote[]
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -227,9 +124,9 @@ export default function DashboardPage() {
             <Link href="/" className="text-muted-foreground hover:text-foreground text-sm mb-2 inline-block">
               ← {t('common.backHome')}
             </Link>
-            <h1 className="text-2xl font-bold">{retro!.title}</h1>
+            <h1 className="text-2xl font-bold">{retro.title}</h1>
             <p className="text-muted-foreground text-sm mt-1">
-              {t('dashboard.feedbackCount', { count: entries.length })} • {t(`formats.${retro!.format}.name`)}
+              {t('dashboard.feedbackCount', { count: entriesList.length })} • {t(`formats.${retro.format}.name`)}
             </p>
           </div>
 
@@ -242,10 +139,10 @@ export default function DashboardPage() {
               )}
             </Button>
             <Button
-              variant={retro!.is_closed ? 'default' : 'destructive'}
+              variant={retro.isClosed ? 'default' : 'destructive'}
               onClick={toggleClose}
             >
-              {retro!.is_closed ? (
+              {retro.isClosed ? (
                 <><LockOpen className="w-4 h-4 mr-2" /> {t('dashboard.reopen')}</>
               ) : (
                 <><Lock className="w-4 h-4 mr-2" /> {t('dashboard.close')}</>
@@ -255,7 +152,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Share banner */}
-        {entries.length === 0 && (
+        {entriesList.length === 0 && (
           <Card className="border-primary bg-primary/5 mb-8">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
@@ -280,13 +177,13 @@ export default function DashboardPage() {
         )}
 
         {/* AI Summary */}
-        <AISummary retroId={retro!.id} entries={entries} isPro={isPro} />
+        <AISummary retroTitle={retro.title} entries={entriesList} isPro={isPro} />
 
         {/* Leaderboard */}
-        <Leaderboard entries={entries} votes={votes} />
+        <Leaderboard entries={entriesList} votes={votesList} />
 
         {/* Closed banner */}
-        {retro!.is_closed && (
+        {retro.isClosed && (
           <Card className="border-destructive bg-destructive/5 mb-8">
             <CardContent className="flex items-center gap-2 py-4">
               <Lock className="w-4 h-4 text-destructive" />
@@ -306,7 +203,7 @@ export default function DashboardPage() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2.5">
                       <IconComponent className={`w-5 h-5 ${config.iconColor}`} />
-                      <span>{t(`formats.${retro!.format}.${category}`)}</span>
+                      <span>{t(`formats.${retro.format}.${category}`)}</span>
                     </CardTitle>
                     <CardDescription>
                       {t('dashboard.responses', { count: entriesByCategory[category].length })}
@@ -322,16 +219,15 @@ export default function DashboardPage() {
                   </Card>
                 ) : (
                   entriesByCategory[category].map((entry) => (
-                    <Card key={entry.id} className="transition-all hover:shadow-md">
+                    <Card key={entry._id} className="transition-all hover:shadow-md">
                       <CardContent className="pt-4">
                         <p className="whitespace-pre-wrap">{entry.content}</p>
                         <p className="text-muted-foreground text-xs mt-2">
-                          {new Date(entry.created_at).toLocaleString(locale === 'it' ? 'it-IT' : 'en-US')}
+                          {new Date(entry.createdAt).toLocaleString(locale === 'it' ? 'it-IT' : 'en-US')}
                         </p>
-                        <VoteButtons 
-                          entryId={entry.id} 
-                          initialVotes={getVotesForEntry(entry.id)}
-                          onVoteChange={(newVotes) => handleVoteChange(entry.id, newVotes)}
+                        <VoteButtons
+                          entryId={entry._id}
+                          initialVotes={getVotesForEntry(entry._id)}
                         />
                       </CardContent>
                     </Card>

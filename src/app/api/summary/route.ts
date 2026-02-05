@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
-import { supabase } from '@/lib/supabase'
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-})
+// Lazy initialization to avoid build-time errors
+let groq: Groq | null = null
+function getGroq(): Groq {
+  if (!groq) {
+    groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+  }
+  return groq
+}
+
+interface EntryData {
+  category: string
+  content: string
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,27 +22,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'GROQ_API_KEY not configured' }, { status: 500 })
     }
 
-    const { retroId, locale = 'en' } = await request.json()
-
-    if (!retroId) {
-      return NextResponse.json({ error: 'Missing retroId' }, { status: 400 })
+    const { retroTitle, entries, locale = 'en' } = await request.json() as {
+      retroTitle: string
+      entries: EntryData[]
+      locale?: string
     }
-
-    // Fetch retro and entries
-    const { data: retro } = await supabase
-      .from('retros')
-      .select('*')
-      .eq('id', retroId)
-      .single()
-
-    if (!retro) {
-      return NextResponse.json({ error: 'Retro not found' }, { status: 404 })
-    }
-
-    const { data: entries } = await supabase
-      .from('entries')
-      .select('*')
-      .eq('retro_id', retroId)
 
     if (!entries || entries.length === 0) {
       return NextResponse.json({ error: 'No entries to summarize' }, { status: 400 })
@@ -64,10 +57,10 @@ Rispondi in italiano. Sii conciso e pratico.`
 
 Be concise and practical.`
 
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroq().chat.completions.create({
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Retrospective: "${retro.title}"\n\nFeedback:\n${feedbackText}` }
+        { role: 'user', content: `Retrospective: "${retroTitle || 'Team Retrospective'}"\n\nFeedback:\n${feedbackText}` }
       ],
       model: 'llama-3.3-70b-versatile',
       temperature: 0.7,

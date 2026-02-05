@@ -3,19 +3,19 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
-import { Entry } from '@/lib/supabase'
+import { Entry } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Sparkles, RefreshCw, Check, Loader2, AlertCircle, Bot, Lock, Crown } from 'lucide-react'
 
 interface AISummaryProps {
-  retroId: string
+  retroTitle: string
   entries: Entry[]
   isPro?: boolean
 }
 
-export default function AISummary({ retroId, entries, isPro = false }: AISummaryProps) {
+export default function AISummary({ retroTitle, entries, isPro = false }: AISummaryProps) {
   const t = useTranslations()
   const locale = useLocale()
   const [summary, setSummary] = useState<string | null>(null)
@@ -57,7 +57,11 @@ export default function AISummary({ retroId, entries, isPro = false }: AISummary
       const res = await fetch('/api/summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ retroId, locale }),
+        body: JSON.stringify({ 
+          retroTitle, 
+          entries: entries.map(e => ({ category: e.category, content: e.content })),
+          locale 
+        }),
       })
 
       const data = await res.json()

@@ -3,6 +3,7 @@ import { Nunito_Sans, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ConvexClientProvider } from '@/components/ConvexClientProvider';
 import "./globals.css";
 
 const nunitoSans = Nunito_Sans({
@@ -50,9 +51,11 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NextIntlClientProvider messages={messages}>
-            {children}
-          </NextIntlClientProvider>
+          <ConvexClientProvider>
+            <NextIntlClientProvider messages={messages}>
+              {children}
+            </NextIntlClientProvider>
+          </ConvexClientProvider>
         </ThemeProvider>
       </body>
     </html>

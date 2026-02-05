@@ -1,13 +1,15 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { supabase, Retro, FORMATS, FormatKey, getVoterId } from '@/lib/supabase'
+import { useQuery, useMutation } from 'convex/react'
+import { api } from '../../../../convex/_generated/api'
+import { FORMATS, FormatKey, getParticipantId } from '@/lib/types'
 import { getCategoryConfig } from '@/lib/category-icons'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import Header from '@/components/Header'
 import KeyboardHints from '@/components/KeyboardHints'
@@ -19,14 +21,22 @@ export default function ParticipatePage() {
   const code = params.code as string
   const t = useTranslations()
   
-  const [retro, setRetro] = useState<Retro | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [entries, setEntries] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
 
+  // Convex queries & mutations
+  const retro = useQuery(api.retros.getByCode, { code: code.toUpperCase() })
+  const createBatch = useMutation(api.entries.createBatch)
+
+  // Loading state
+  const loading = retro === undefined
+
+  // Initialize entries when retro loads
+  const format = retro ? FORMATS[retro.format as FormatKey] : null
+  
   // Keyboard shortcuts
   useKeyboardShortcuts([
     { key: 'Enter', meta: true, action: () => formRef.current?.requestSubmit(), description: 'Submit feedback' },
@@ -35,35 +45,6 @@ export default function ParticipatePage() {
   const keyboardHints = [
     { keys: ['cmd', 'enter'], description: 'Submit' },
   ]
-
-  useEffect(() => {
-    loadRetro()
-  }, [code])
-
-  const loadRetro = async () => {
-    const { data, error: dbError } = await supabase
-      .from('retros')
-      .select('*')
-      .eq('access_code', code)
-      .single()
-
-    if (dbError || !data) {
-      setError(t('participate.notFound'))
-      setLoading(false)
-      return
-    }
-
-    setRetro(data)
-    
-    const format = FORMATS[data.format as FormatKey]
-    const initialEntries: Record<string, string> = {}
-    format.categories.forEach(cat => {
-      initialEntries[cat] = ''
-    })
-    setEntries(initialEntries)
-    
-    setLoading(false)
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -85,36 +66,25 @@ export default function ParticipatePage() {
       }))
 
     try {
-      const res = await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          retroId: retro!.id,
-          entries: feedbackEntries,
-          participantId: getVoterId(), // Use same ID as for voting
-        }),
+      await createBatch({
+        retroId: retro!._id,
+        entries: feedbackEntries,
+        participantId: getParticipantId(),
       })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        // Handle specific errors
-        if (data.error === 'LINK_EXPIRED') {
-          setError(t('participate.linkExpired') || 'This link has expired.')
-        } else if (data.error === 'PARTICIPANT_LIMIT') {
-          setError(t('participate.participantLimit') || 'Maximum participants reached.')
-        } else if (data.error === 'RETRO_CLOSED') {
-          setError(t('participate.closed'))
-        } else {
-          setError(t('participate.errorGeneric'))
-        }
-        setSubmitting(false)
-        return
-      }
-
       setSubmitted(true)
-    } catch (err) {
-      setError(t('participate.errorGeneric'))
+    } catch (err: any) {
+      const errorMessage = err?.message || ''
+      
+      if (errorMessage === 'LINK_EXPIRED') {
+        setError(t('participate.linkExpired') || 'This link has expired.')
+      } else if (errorMessage === 'PARTICIPANT_LIMIT') {
+        setError(t('participate.participantLimit') || 'Maximum participants reached.')
+      } else if (errorMessage === 'RETRO_CLOSED') {
+        setError(t('participate.closed'))
+      } else {
+        setError(t('participate.errorGeneric'))
+      }
+    } finally {
       setSubmitting(false)
     }
   }
@@ -127,12 +97,12 @@ export default function ParticipatePage() {
     )
   }
 
-  if (error && !retro) {
+  if (!retro) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="text-center p-6">
           <CardContent>
-            <div className="text-destructive mb-4">{error}</div>
+            <div className="text-destructive mb-4">{t('participate.notFound')}</div>
             <Button asChild variant="outline">
               <Link href="/">{t('common.backHome')}</Link>
             </Button>
@@ -142,7 +112,7 @@ export default function ParticipatePage() {
     )
   }
 
-  if (retro?.is_closed) {
+  if (retro.isClosed) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <Card className="text-center p-8 max-w-sm w-full">
@@ -175,9 +145,8 @@ export default function ParticipatePage() {
               variant="outline"
               onClick={() => {
                 setSubmitted(false)
-                const format = FORMATS[retro!.format as FormatKey]
                 const resetEntries: Record<string, string> = {}
-                format.categories.forEach(cat => {
+                format!.categories.forEach(cat => {
                   resetEntries[cat] = ''
                 })
                 setEntries(resetEntries)
@@ -191,8 +160,6 @@ export default function ParticipatePage() {
     )
   }
 
-  const format = FORMATS[retro!.format as FormatKey]
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -200,12 +167,12 @@ export default function ParticipatePage() {
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold mb-2">{retro!.title}</h1>
+            <h1 className="text-3xl font-bold mb-2">{retro.title}</h1>
             <p className="text-muted-foreground">{t('participate.anonymous')}</p>
           </div>
 
           <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
-            {format.categories.map((category) => {
+            {format!.categories.map((category) => {
               const config = getCategoryConfig(category)
               const IconComponent = config.icon
               return (
@@ -213,13 +180,11 @@ export default function ParticipatePage() {
                   key={category}
                   className={`border-l-4 ${config.border} ${config.bg} transition-all hover:shadow-md`}
                 >
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2.5">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-2.5 mb-3">
                       <IconComponent className={`w-5 h-5 ${config.iconColor}`} />
-                      <span>{t(`formats.${retro!.format}.${category}`)}</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                      <span className="font-medium">{t(`formats.${retro.format}.${category}`)}</span>
+                    </div>
                     <Textarea
                       value={entries[category] || ''}
                       onChange={(e) => setEntries(prev => ({ ...prev, [category]: e.target.value }))}

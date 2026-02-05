@@ -82,14 +82,16 @@ export const updatePlan = mutation({
     let user;
 
     if (args.workosId) {
+      const workosId = args.workosId;
       user = await ctx.db
         .query("users")
-        .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))
+        .withIndex("by_workos_id", (q) => q.eq("workosId", workosId))
         .first();
     } else if (args.stripeCustomerId) {
+      const stripeCustomerId = args.stripeCustomerId;
       user = await ctx.db
         .query("users")
-        .withIndex("by_stripe_customer", (q) => q.eq("stripeCustomerId", args.stripeCustomerId))
+        .withIndex("by_stripe_customer", (q) => q.eq("stripeCustomerId", stripeCustomerId))
         .first();
     }
 

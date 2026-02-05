@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { createClient } from '@/lib/supabase/client'
-import { FORMATS, FormatKey } from '@/lib/supabase'
+import { useQuery, useMutation } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
+import { FORMATS, FormatKey } from '@/lib/types'
 import { getCategoryConfig } from '@/lib/category-icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -35,52 +36,16 @@ export default function CreateRetro() {
   const [format, setFormat] = useState<FormatKey>('start-stop-continue')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [limitReached, setLimitReached] = useState(false)
-  const [retroCount, setRetroCount] = useState(0)
-  const [isPro, setIsPro] = useState(false)
-  const [checkingLimit, setCheckingLimit] = useState(true)
   const formRef = useRef<HTMLFormElement>(null)
 
-  // Check subscription and retro count on mount
-  useEffect(() => {
-    const checkLimits = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        setCheckingLimit(false)
-        return
-      }
+  // Convex queries & mutations
+  const user = useQuery(api.users.getCurrent)
+  const retroCount = useQuery(api.retros.countByUser) ?? 0
+  const createRetro = useMutation(api.retros.create)
 
-      // Check if user has pro subscription
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('status')
-        .eq('user_id', user.id)
-        .in('status', ['active', 'past_due'])
-        .single()
-
-      if (subscription) {
-        setIsPro(true)
-        setCheckingLimit(false)
-        return
-      }
-
-      // Count user's retros (only open ones count against limit)
-      const { count } = await supabase
-        .from('retros')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_closed', false)
-
-      const currentCount = count || 0
-      setRetroCount(currentCount)
-      setLimitReached(currentCount >= FREE_RETRO_LIMIT)
-      setCheckingLimit(false)
-    }
-
-    checkLimits()
-  }, [])
+  const checkingLimit = user === undefined
+  const isPro = user?.plan === 'pro'
+  const limitReached = !isPro && retroCount >= FREE_RETRO_LIMIT
 
   // Keyboard shortcuts
   useKeyboardShortcuts([
@@ -103,29 +68,24 @@ export default function CreateRetro() {
     setError('')
 
     try {
-      const response = await fetch('/api/retros', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim(), format }),
+      const result = await createRetro({
+        title: title.trim(),
+        format,
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        if (data.code === 'LIMIT_REACHED') {
-          setLimitReached(true)
-          setError(t('create.limitReached', { count: data.limit }))
-        } else {
-          setError(t('create.errorGeneric'))
-        }
-        setLoading(false)
-        return
+      // Redirect to the dashboard with the access code
+      router.push(`/dashboard/${result.accessCode}`)
+    } catch (err: any) {
+      const errorMessage = err?.message || ''
+      
+      if (errorMessage === 'RETRO_LIMIT_REACHED') {
+        setError(t('create.limitReached', { count: FREE_RETRO_LIMIT }))
+      } else if (errorMessage === 'Not authenticated') {
+        router.push('/login')
+      } else {
+        setError(t('create.errorGeneric'))
       }
-
-      router.push(`/dashboard/${data.retro.access_code}`)
-    } catch (err) {
-      console.error('Create retro error:', err)
-      setError(t('create.errorGeneric'))
+    } finally {
       setLoading(false)
     }
   }
@@ -141,7 +101,7 @@ export default function CreateRetro() {
           </Link>
 
           {/* Limit reached banner */}
-          {limitReached && !isPro && (
+          {limitReached && (
             <Alert className="mb-6 border-amber-500 bg-amber-500/10">
               <Crown className="h-4 w-4 text-amber-500" />
               <AlertDescription className="flex items-center justify-between">
@@ -220,7 +180,7 @@ export default function CreateRetro() {
 
                 <Button 
                   type="submit" 
-                  disabled={loading || checkingLimit || (limitReached && !isPro)} 
+                  disabled={loading || checkingLimit || limitReached} 
                   className="w-full"
                 >
                   {checkingLimit ? t('common.loading') : loading ? t('create.submitting') : t('create.submit')}
