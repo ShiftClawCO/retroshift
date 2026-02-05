@@ -1,20 +1,19 @@
 import { query, mutation } from "./_generated/server";
+import { queryWithRLS } from "./functions";
 import { v } from "convex/values";
 
-// Get subscription by user (auth-checked: caller must own this userId)
-export const getByUser = query({
+// ─── Authenticated endpoints (RLS-protected) ──────────────
+
+/**
+ * Get subscription by user ID.
+ * RLS ensures only own subscription is returned.
+ */
+export const getByUser = queryWithRLS({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
+    if (!ctx.user) return null;
 
-    // Verify the caller owns the requested userId
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_workos_id", (q) => q.eq("workosId", identity.subject))
-      .first();
-    if (!user || user._id !== args.userId) return null;
-
+    // RLS-wrapped db: only returns subscriptions for the authenticated user
     return await ctx.db
       .query("subscriptions")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
@@ -23,8 +22,30 @@ export const getByUser = query({
   },
 });
 
-// Get subscription by Stripe subscription ID
-// Called from Stripe webhook (server-side validated via signature)
+/**
+ * Get current user's subscription.
+ * RLS ensures only own subscription is returned.
+ */
+export const getCurrent = queryWithRLS({
+  args: {},
+  handler: async (ctx) => {
+    if (!ctx.user) return null;
+
+    return await ctx.db
+      .query("subscriptions")
+      .withIndex("by_user", (q) => q.eq("userId", ctx.user!._id))
+      .order("desc")
+      .first();
+  },
+});
+
+// ─── Server-side / webhook endpoints (no RLS) ─────────────
+// These are called from Stripe webhooks and validated by signature.
+
+/**
+ * Get subscription by Stripe subscription ID.
+ * Server-side only — called from Stripe webhook.
+ */
 export const getByStripeId = query({
   args: { stripeSubscriptionId: v.string() },
   handler: async (ctx, args) => {
@@ -37,30 +58,10 @@ export const getByStripeId = query({
   },
 });
 
-// Get current user's subscription
-export const getCurrent = query({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_workos_id", (q) => q.eq("workosId", identity.subject))
-      .first();
-
-    if (!user) return null;
-
-    return await ctx.db
-      .query("subscriptions")
-      .withIndex("by_user", (q) => q.eq("userId", user._id))
-      .order("desc")
-      .first();
-  },
-});
-
-// Create subscription
-// Called from Stripe webhook (server-side validated via signature)
+/**
+ * Create subscription.
+ * Server-side only — called from Stripe webhook.
+ */
 export const create = mutation({
   args: {
     workosId: v.string(),
@@ -92,8 +93,10 @@ export const create = mutation({
   },
 });
 
-// Update subscription
-// Called from Stripe webhook (server-side validated via signature)
+/**
+ * Update subscription.
+ * Server-side only — called from Stripe webhook.
+ */
 export const update = mutation({
   args: {
     stripeSubscriptionId: v.string(),
@@ -112,7 +115,7 @@ export const update = mutation({
       throw new Error("Subscription not found");
     }
 
-    const updates: any = { updatedAt: Date.now() };
+    const updates: Record<string, unknown> = { updatedAt: Date.now() };
     if (args.status !== undefined) updates.status = args.status;
     if (args.currentPeriodEnd !== undefined)
       updates.currentPeriodEnd = args.currentPeriodEnd;
@@ -122,8 +125,10 @@ export const update = mutation({
   },
 });
 
-// Cancel subscription
-// Called from Stripe webhook (server-side validated via signature)
+/**
+ * Cancel subscription.
+ * Server-side only — called from Stripe webhook.
+ */
 export const cancel = mutation({
   args: { stripeSubscriptionId: v.string() },
   handler: async (ctx, args) => {

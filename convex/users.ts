@@ -1,13 +1,24 @@
 import { query, mutation } from "./_generated/server";
+import { queryWithRLS } from "./functions";
 import { v } from "convex/values";
 
-// Get user by WorkOS ID (auth-checked: caller must own this workosId)
-export const getByWorkosId = query({
+// ─── Authenticated endpoints (RLS-protected) ──────────────
+
+/**
+ * Get user by WorkOS ID.
+ * RLS ensures only own record is returned.
+ */
+export const getByWorkosId = queryWithRLS({
   args: { workosId: v.string() },
   handler: async (ctx, args) => {
+    if (!ctx.user) return null;
+
+    // Verify the caller's identity matches the requested workosId
+    // (defense-in-depth — RLS also filters)
     const identity = await ctx.auth.getUserIdentity();
     if (!identity || identity.subject !== args.workosId) return null;
 
+    // RLS-wrapped db: only returns own user record
     return await ctx.db
       .query("users")
       .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))
@@ -15,33 +26,43 @@ export const getByWorkosId = query({
   },
 });
 
-// Get current user (from auth context)
-export const getCurrent = query({
+/**
+ * Get current authenticated user.
+ * RLS ensures only own record is returned.
+ */
+export const getCurrent = queryWithRLS({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-
-    return await ctx.db
-      .query("users")
-      .withIndex("by_workos_id", (q) => q.eq("workosId", identity.subject))
-      .first();
+    // ctx.user is already resolved by the RLS builder
+    return ctx.user;
   },
 });
 
-// Get user by Stripe customer ID
-// Called from Stripe webhook (server-side validated via signature)
+// ─── Server-side / webhook endpoints (no RLS) ─────────────
+// These are called from Stripe webhooks and validated by signature.
+// They need unrestricted db access.
+
+/**
+ * Get user by Stripe customer ID.
+ * Server-side only — called from Stripe webhook (validated by signature).
+ */
 export const getByStripeCustomer = query({
   args: { stripeCustomerId: v.string() },
   handler: async (ctx, args) => {
     return await ctx.db
       .query("users")
-      .withIndex("by_stripe_customer", (q) => q.eq("stripeCustomerId", args.stripeCustomerId))
+      .withIndex("by_stripe_customer", (q) =>
+        q.eq("stripeCustomerId", args.stripeCustomerId)
+      )
       .first();
   },
 });
 
-// Upsert user (create or update from WorkOS, auth-checked)
+/**
+ * Upsert user (create or update from WorkOS auth flow).
+ * Uses standard mutation because it needs to handle user creation
+ * (user may not exist yet on first login).
+ */
 export const upsert = mutation({
   args: {
     workosId: v.string(),
@@ -80,8 +101,10 @@ export const upsert = mutation({
   },
 });
 
-// Update user plan
-// Called from Stripe webhook (server-side validated via signature)
+/**
+ * Update user plan.
+ * Server-side only — called from Stripe webhook (validated by signature).
+ */
 export const updatePlan = mutation({
   args: {
     workosId: v.optional(v.string()),
@@ -101,7 +124,9 @@ export const updatePlan = mutation({
       const stripeCustomerId = args.stripeCustomerId;
       user = await ctx.db
         .query("users")
-        .withIndex("by_stripe_customer", (q) => q.eq("stripeCustomerId", stripeCustomerId))
+        .withIndex("by_stripe_customer", (q) =>
+          q.eq("stripeCustomerId", stripeCustomerId)
+        )
         .first();
     }
 
@@ -114,8 +139,10 @@ export const updatePlan = mutation({
   },
 });
 
-// Update Stripe customer ID
-// Called from Stripe webhook (server-side validated via signature)
+/**
+ * Update Stripe customer ID.
+ * Server-side only — called from Stripe webhook (validated by signature).
+ */
 export const updateStripeCustomer = mutation({
   args: {
     workosId: v.string(),
@@ -131,7 +158,9 @@ export const updateStripeCustomer = mutation({
       throw new Error("User not found");
     }
 
-    await ctx.db.patch(user._id, { stripeCustomerId: args.stripeCustomerId });
+    await ctx.db.patch(user._id, {
+      stripeCustomerId: args.stripeCustomerId,
+    });
     return user._id;
   },
 });
