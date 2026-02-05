@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { mutation, internalQuery, internalMutation } from "./_generated/server";
 import { queryWithRLS } from "./functions";
 import { v } from "convex/values";
 
@@ -44,9 +44,9 @@ export const getCurrent = queryWithRLS({
 
 /**
  * Get user by Stripe customer ID.
- * Server-side only — called from Stripe webhook (validated by signature).
+ * Internal only — called from Convex actions (webhook processing).
  */
-export const getByStripeCustomer = query({
+export const getByStripeCustomer = internalQuery({
   args: { stripeCustomerId: v.string() },
   handler: async (ctx, args) => {
     return await ctx.db
@@ -103,9 +103,9 @@ export const upsert = mutation({
 
 /**
  * Update user plan.
- * Server-side only — called from Stripe webhook (validated by signature).
+ * Internal only — called from Convex actions (webhook processing).
  */
-export const updatePlan = mutation({
+export const updatePlan = internalMutation({
   args: {
     workosId: v.optional(v.string()),
     stripeCustomerId: v.optional(v.string()),
@@ -141,9 +141,9 @@ export const updatePlan = mutation({
 
 /**
  * Update Stripe customer ID.
- * Server-side only — called from Stripe webhook (validated by signature).
+ * Internal only — called from Convex actions (checkout processing).
  */
-export const updateStripeCustomer = mutation({
+export const updateStripeCustomer = internalMutation({
   args: {
     workosId: v.string(),
     stripeCustomerId: v.string(),

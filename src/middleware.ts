@@ -8,7 +8,12 @@ const publicPaths = [
   '/signup',
   '/auth/callback',
   '/auth/signout',
-  '/api/summary',
+];
+
+// API routes that are explicitly public (handle their own auth or use webhook signatures)
+const publicApiPaths = [
+  '/api/stripe/webhook',  // Verified by Stripe signature
+  '/api/auth/token',       // Handles its own auth
 ];
 
 // Check if path matches a pattern (supports /r/:code style)
@@ -16,10 +21,12 @@ function isPublicPath(pathname: string): boolean {
   // Exact matches
   if (publicPaths.includes(pathname)) return true;
   
+  // Whitelisted public API routes only
+  if (publicApiPaths.includes(pathname)) return true;
+  
   // Pattern matches
   if (pathname.startsWith('/r/')) return true;
   if (pathname.startsWith('/_next/')) return true;
-  if (pathname.startsWith('/api/')) return true;
   
   return false;
 }

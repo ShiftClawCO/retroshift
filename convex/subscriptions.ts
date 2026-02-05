@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { internalQuery, internalMutation } from "./_generated/server";
 import { queryWithRLS } from "./functions";
 import { v } from "convex/values";
 
@@ -44,9 +44,9 @@ export const getCurrent = queryWithRLS({
 
 /**
  * Get subscription by Stripe subscription ID.
- * Server-side only — called from Stripe webhook.
+ * Internal only — called from Convex actions (webhook processing).
  */
-export const getByStripeId = query({
+export const getByStripeId = internalQuery({
   args: { stripeSubscriptionId: v.string() },
   handler: async (ctx, args) => {
     return await ctx.db
@@ -60,9 +60,9 @@ export const getByStripeId = query({
 
 /**
  * Create subscription.
- * Server-side only — called from Stripe webhook.
+ * Internal only — called from Convex actions (webhook processing).
  */
-export const create = mutation({
+export const create = internalMutation({
   args: {
     workosId: v.string(),
     stripeSubscriptionId: v.string(),
@@ -95,9 +95,9 @@ export const create = mutation({
 
 /**
  * Update subscription.
- * Server-side only — called from Stripe webhook.
+ * Internal only — called from Convex actions (webhook processing).
  */
-export const update = mutation({
+export const update = internalMutation({
   args: {
     stripeSubscriptionId: v.string(),
     status: v.optional(v.string()),
@@ -127,9 +127,9 @@ export const update = mutation({
 
 /**
  * Cancel subscription.
- * Server-side only — called from Stripe webhook.
+ * Internal only — called from Convex actions (webhook processing).
  */
-export const cancel = mutation({
+export const cancel = internalMutation({
   args: { stripeSubscriptionId: v.string() },
   handler: async (ctx, args) => {
     const subscription = await ctx.db

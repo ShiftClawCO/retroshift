@@ -35,17 +35,13 @@ export async function POST(req: Request) {
         session.subscription as string
       );
       
-      await convex.mutation(api.subscriptions.create, {
+      // Use Convex action that calls internal mutations
+      await convex.action(api.stripe.fulfillCheckout, {
         workosId: session.metadata.workosId,
         stripeSubscriptionId: subscriptionData.id,
         stripePriceId: subscriptionData.items.data[0].price.id,
         status: subscriptionData.status,
         currentPeriodEnd: (subscriptionData as any).current_period_end * 1000,
-      });
-      
-      await convex.mutation(api.users.updatePlan, {
-        workosId: session.metadata.workosId,
-        plan: "pro",
       });
       break;
     }
@@ -53,20 +49,14 @@ export async function POST(req: Request) {
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
       
-      try {
-        await convex.mutation(api.subscriptions.update, {
-          stripeSubscriptionId: subscription.id,
-          status: subscription.status,
-          currentPeriodEnd: (subscription as any).current_period_end * 1000,
-        });
-      } catch (err) {
-        // Subscription may not exist yet if this fires before checkout.session.completed
-        console.warn("Could not update subscription:", err);
-      }
-      
       // Update plan based on status
       const plan = subscription.status === "active" ? "pro" : "free";
-      await convex.mutation(api.users.updatePlan, {
+      
+      // Use Convex action that calls internal mutations
+      await convex.action(api.stripe.handleSubscriptionUpdated, {
+        stripeSubscriptionId: subscription.id,
+        status: subscription.status,
+        currentPeriodEnd: (subscription as any).current_period_end * 1000,
         stripeCustomerId: subscription.customer as string,
         plan,
       });
@@ -76,18 +66,10 @@ export async function POST(req: Request) {
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       
-      try {
-        await convex.mutation(api.subscriptions.update, {
-          stripeSubscriptionId: subscription.id,
-          status: "canceled",
-        });
-      } catch (err) {
-        console.warn("Could not update subscription on delete:", err);
-      }
-      
-      await convex.mutation(api.users.updatePlan, {
+      // Use Convex action that calls internal mutations
+      await convex.action(api.stripe.handleSubscriptionDeleted, {
+        stripeSubscriptionId: subscription.id,
         stripeCustomerId: subscription.customer as string,
-        plan: "free",
       });
       break;
     }

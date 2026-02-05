@@ -13,6 +13,7 @@ import type * as entries from "../entries.js";
 import type * as functions from "../functions.js";
 import type * as retros from "../retros.js";
 import type * as rules from "../rules.js";
+import type * as stripe from "../stripe.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
 import type * as votes from "../votes.js";
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   functions: typeof functions;
   retros: typeof retros;
   rules: typeof rules;
+  stripe: typeof stripe;
   subscriptions: typeof subscriptions;
   users: typeof users;
   votes: typeof votes;

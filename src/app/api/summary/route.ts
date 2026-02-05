@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
+import { getSession } from '@/lib/auth'
 
 // Lazy initialization to avoid build-time errors
 let groq: Groq | null = null
@@ -17,6 +18,12 @@ interface EntryData {
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check — prevent unauthenticated API credit consumption
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     // Check API key first
     if (!process.env.GROQ_API_KEY) {
       return NextResponse.json({ error: 'GROQ_API_KEY not configured' }, { status: 500 })

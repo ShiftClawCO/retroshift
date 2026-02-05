@@ -26,7 +26,8 @@ export async function POST() {
     });
     customerId = customer.id;
     
-    await convex.mutation(api.users.updateStripeCustomer, {
+    // Use Convex action that calls internal mutation
+    await convex.action(api.stripe.linkStripeCustomer, {
       workosId: user.id,
       stripeCustomerId: customerId,
     });

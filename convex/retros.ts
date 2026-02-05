@@ -303,11 +303,40 @@ export const remove = mutationWithRLS({
 export const getByCode = query({
   args: { code: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const retro = await ctx.db
       .query("retros")
       .withIndex("by_access_code", (q) =>
         q.eq("accessCode", args.code.toUpperCase())
       )
       .first();
+
+    if (!retro) return null;
+
+    // Check if the caller is the authenticated owner
+    let isOwner = false;
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const user = await ctx.db
+        .query("users")
+        .withIndex("by_workos_id", (q) =>
+          q.eq("workosId", identity.subject)
+        )
+        .first();
+      isOwner = !!user && retro.userId === user._id;
+    }
+
+    // Return safe fields for all callers.
+    // userId is included only for the authenticated owner (needed for
+    // dashboard ownership check). Anonymous participants never see it.
+    return {
+      _id: retro._id,
+      _creationTime: retro._creationTime,
+      title: retro.title,
+      format: retro.format,
+      accessCode: retro.accessCode,
+      isClosed: retro.isClosed,
+      createdAt: retro.createdAt,
+      userId: isOwner ? retro.userId : undefined,
+    };
   },
 });
