@@ -1,10 +1,13 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-// Get user by WorkOS ID
+// Get user by WorkOS ID (auth-checked: caller must own this workosId)
 export const getByWorkosId = query({
   args: { workosId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || identity.subject !== args.workosId) return null;
+
     return await ctx.db
       .query("users")
       .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))
@@ -27,6 +30,7 @@ export const getCurrent = query({
 });
 
 // Get user by Stripe customer ID
+// Called from Stripe webhook (server-side validated via signature)
 export const getByStripeCustomer = query({
   args: { stripeCustomerId: v.string() },
   handler: async (ctx, args) => {
@@ -37,7 +41,7 @@ export const getByStripeCustomer = query({
   },
 });
 
-// Upsert user (create or update from WorkOS)
+// Upsert user (create or update from WorkOS, auth-checked)
 export const upsert = mutation({
   args: {
     workosId: v.string(),
@@ -46,6 +50,11 @@ export const upsert = mutation({
     avatarUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || identity.subject !== args.workosId) {
+      throw new Error("Not authenticated");
+    }
+
     const existing = await ctx.db
       .query("users")
       .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))
@@ -71,7 +80,8 @@ export const upsert = mutation({
   },
 });
 
-// Update user plan (from Stripe webhook)
+// Update user plan
+// Called from Stripe webhook (server-side validated via signature)
 export const updatePlan = mutation({
   args: {
     workosId: v.optional(v.string()),
@@ -105,6 +115,7 @@ export const updatePlan = mutation({
 });
 
 // Update Stripe customer ID
+// Called from Stripe webhook (server-side validated via signature)
 export const updateStripeCustomer = mutation({
   args: {
     workosId: v.string(),

@@ -1,10 +1,20 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-// Get subscription by user
+// Get subscription by user (auth-checked: caller must own this userId)
 export const getByUser = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    // Verify the caller owns the requested userId
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_workos_id", (q) => q.eq("workosId", identity.subject))
+      .first();
+    if (!user || user._id !== args.userId) return null;
+
     return await ctx.db
       .query("subscriptions")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
@@ -14,6 +24,7 @@ export const getByUser = query({
 });
 
 // Get subscription by Stripe subscription ID
+// Called from Stripe webhook (server-side validated via signature)
 export const getByStripeId = query({
   args: { stripeSubscriptionId: v.string() },
   handler: async (ctx, args) => {
@@ -48,7 +59,8 @@ export const getCurrent = query({
   },
 });
 
-// Create subscription (from Stripe webhook)
+// Create subscription
+// Called from Stripe webhook (server-side validated via signature)
 export const create = mutation({
   args: {
     workosId: v.string(),
@@ -80,7 +92,8 @@ export const create = mutation({
   },
 });
 
-// Update subscription (from Stripe webhook)
+// Update subscription
+// Called from Stripe webhook (server-side validated via signature)
 export const update = mutation({
   args: {
     stripeSubscriptionId: v.string(),
@@ -110,6 +123,7 @@ export const update = mutation({
 });
 
 // Cancel subscription
+// Called from Stripe webhook (server-side validated via signature)
 export const cancel = mutation({
   args: { stripeSubscriptionId: v.string() },
   handler: async (ctx, args) => {
