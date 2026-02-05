@@ -149,7 +149,14 @@
     "responses": "{count} responses",
     "autoRefresh": "New feedback will appear automatically",
     "accessDenied": "Access Denied",
-    "accessDeniedDesc": "You don't have permission to view this retrospective."
+    "accessDeniedDesc": "You don't have permission to view this retrospective.",
+    "exportPdf": "Export PDF",
+    "exportPdfPro": "Export PDF (Pro)",
+    "generating": "Generating...",
+    "pdfVotes": "Votes",
+    "pdfNoEntries": "No feedback yet",
+    "pdfGeneratedAt": "Generated on",
+    "pdfSummaryTitle": "AI Summary"
   },
   "formats": {
     "start-stop-continue": {

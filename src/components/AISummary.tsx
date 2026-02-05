@@ -13,9 +13,10 @@ interface AISummaryProps {
   retroTitle: string
   entries: Entry[]
   isPro?: boolean
+  onSummaryChange?: (summary: string | null) => void
 }
 
-export default function AISummary({ retroTitle, entries, isPro = false }: AISummaryProps) {
+export default function AISummary({ retroTitle, entries, isPro = false, onSummaryChange }: AISummaryProps) {
   const t = useTranslations()
   const locale = useLocale()
   const [summary, setSummary] = useState<string | null>(null)
@@ -71,6 +72,7 @@ export default function AISummary({ retroTitle, entries, isPro = false }: AISumm
       }
 
       setSummary(data.summary)
+      onSummaryChange?.(data.summary)
       setLastEntriesHash(entriesHash)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')

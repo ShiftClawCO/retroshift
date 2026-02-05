@@ -149,7 +149,14 @@
     "responses": "{count} risposte",
     "autoRefresh": "I nuovi feedback appariranno automaticamente",
     "accessDenied": "Accesso negato",
-    "accessDeniedDesc": "Non hai i permessi per visualizzare questa retrospettiva."
+    "accessDeniedDesc": "Non hai i permessi per visualizzare questa retrospettiva.",
+    "exportPdf": "Esporta PDF",
+    "exportPdfPro": "Esporta PDF (Pro)",
+    "generating": "Generazione...",
+    "pdfVotes": "Voti",
+    "pdfNoEntries": "Nessun feedback ancora",
+    "pdfGeneratedAt": "Generato il",
+    "pdfSummaryTitle": "Riepilogo AI"
   },
   "formats": {
     "start-stop-continue": {

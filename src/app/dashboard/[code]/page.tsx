@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
@@ -9,10 +9,11 @@ import { api } from '../../../../convex/_generated/api'
 import { useAuth } from '@/components/AuthProvider'
 import { FORMATS, FormatKey, type Entry, type Vote } from '@/lib/types'
 import { getCategoryConfig } from '@/lib/category-icons'
+import { generateRetroPdf } from '@/lib/pdf-export'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Lock, LockOpen, Link2, Check, Share2 } from 'lucide-react'
+import { Lock, LockOpen, Link2, Check, Share2, FileDown, Loader2, Crown } from 'lucide-react'
 import Header from '@/components/Header'
 import VoteButtons from '@/components/VoteButtons'
 import AISummary from '@/components/AISummary'
@@ -28,6 +29,8 @@ export default function DashboardPage() {
   const { user: workosUser } = useAuth()
 
   const [copied, setCopied] = useState(false)
+  const [pdfGenerating, setPdfGenerating] = useState(false)
+  const aiSummaryRef = useRef<string | null>(null)
 
   // Convex queries
   const retro = useQuery(api.retros.getByCode, { code })
@@ -70,6 +73,39 @@ export default function DashboardPage() {
       console.error('Error toggling retro:', err)
     }
   }, [retro, toggleCloseMutation])
+
+  const handleExportPdf = useCallback(async () => {
+    if (!retro || !isPro || pdfGenerating) return
+    setPdfGenerating(true)
+    try {
+      const fmt = retro.format as FormatKey
+      const formatDef = FORMATS[fmt]
+      const categoryLabels: Record<string, string> = {}
+      for (const cat of formatDef.categories) {
+        categoryLabels[cat] = t(`formats.${retro.format}.${cat}`)
+      }
+      generateRetroPdf({
+        title: retro.title,
+        format: fmt,
+        createdAt: retro.createdAt,
+        entries: (entries || []) as Entry[],
+        votes: (allVotes || []) as Vote[],
+        aiSummary: aiSummaryRef.current,
+        locale,
+        translations: {
+          exportTitle: t('dashboard.exportPdf'),
+          categoryLabels,
+          formatName: t(`formats.${retro.format}.name`),
+          votesLabel: t('dashboard.pdfVotes'),
+          summaryTitle: t('dashboard.pdfSummaryTitle'),
+          noEntries: t('dashboard.pdfNoEntries'),
+          generatedAt: t('dashboard.pdfGeneratedAt'),
+        },
+      })
+    } finally {
+      setPdfGenerating(false)
+    }
+  }, [retro, isPro, pdfGenerating, entries, allVotes, locale, t])
 
   // Keyboard shortcuts
   useKeyboardShortcuts([
@@ -172,6 +208,26 @@ export default function DashboardPage() {
                 <><Link2 className="w-4 h-4 mr-2" /> {t('dashboard.copyLink')}</>
               )}
             </Button>
+            {isPro ? (
+              <Button
+                variant="outline"
+                onClick={handleExportPdf}
+                disabled={pdfGenerating}
+              >
+                {pdfGenerating ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('dashboard.generating')}</>
+                ) : (
+                  <><FileDown className="w-4 h-4 mr-2" /> {t('dashboard.exportPdf')}</>
+                )}
+              </Button>
+            ) : (
+              <Button variant="outline" asChild className="text-muted-foreground">
+                <Link href="/pricing">
+                  <Crown className="w-4 h-4 mr-2" />
+                  {t('dashboard.exportPdfPro')}
+                </Link>
+              </Button>
+            )}
             <Button
               variant={retro.isClosed ? 'default' : 'destructive'}
               onClick={toggleClose}
@@ -211,7 +267,7 @@ export default function DashboardPage() {
         )}
 
         {/* AI Summary */}
-        <AISummary retroTitle={retro.title} entries={entriesList} isPro={isPro} />
+        <AISummary retroTitle={retro.title} entries={entriesList} isPro={isPro} onSummaryChange={(s) => { aiSummaryRef.current = s }} />
 
         {/* Leaderboard */}
         <Leaderboard entries={entriesList} votes={votesList} />
