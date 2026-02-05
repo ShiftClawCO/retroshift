@@ -3,12 +3,18 @@
 import Link from 'next/link'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import { useAuth } from './AuthProvider'
 import { Button } from '@/components/ui/button'
-import { Zap, Plus, List } from 'lucide-react'
+import { Zap, Plus, List, LogOut } from 'lucide-react'
 
 export default function Header() {
-  const user = useQuery(api.users.getCurrent)
-  const isLoggedIn = !!user
+  const { user: workosUser } = useAuth()
+  const convexUser = useQuery(
+    api.users.getByWorkosId,
+    workosUser ? { workosId: workosUser.id } : 'skip'
+  )
+  
+  const isLoggedIn = !!workosUser
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -33,14 +39,19 @@ export default function Header() {
                   New Retro
                 </Link>
               </Button>
+              <form action="/auth/signout" method="GET">
+                <Button variant="ghost" size="sm" type="submit">
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </form>
             </>
           ) : (
             <>
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/create">Try Free</Link>
               </Button>
-              <Button size="sm" disabled title="Auth coming soon">
-                Sign In
+              <Button size="sm" asChild>
+                <Link href="/login">Sign In</Link>
               </Button>
             </>
           )}

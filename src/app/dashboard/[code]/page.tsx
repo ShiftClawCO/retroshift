@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../../../convex/_generated/api'
+import { useAuth } from '@/components/AuthProvider'
 import { FORMATS, FormatKey, type Entry, type Vote } from '@/lib/types'
 import { getCategoryConfig } from '@/lib/category-icons'
 import { Button } from '@/components/ui/button'
@@ -24,12 +25,16 @@ export default function DashboardPage() {
   const code = params.code as string
   const t = useTranslations()
   const locale = useLocale()
+  const { user: workosUser } = useAuth()
 
   const [copied, setCopied] = useState(false)
 
   // Convex queries
   const retro = useQuery(api.retros.getByCode, { code })
-  const user = useQuery(api.users.getCurrent)
+  const convexUser = useQuery(
+    api.users.getByWorkosId,
+    workosUser ? { workosId: workosUser.id } : 'skip'
+  )
   const entries = useQuery(
     api.entries.listByRetro,
     retro ? { retroId: retro._id } : "skip"
@@ -48,7 +53,7 @@ export default function DashboardPage() {
   const loading = retro === undefined
 
   // Check if user is Pro
-  const isPro = user?.plan === 'pro'
+  const isPro = convexUser?.plan === 'pro'
 
   const copyShareLink = useCallback(() => {
     const url = `${window.location.origin}/r/${code}`

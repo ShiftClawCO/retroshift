@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
+import { useAuth } from '@/components/AuthProvider'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +13,12 @@ import { Plus, ExternalLink, Lock, Unlock } from 'lucide-react'
 
 export default function MyRetrosPage() {
   const t = useTranslations()
-  const retros = useQuery(api.retros.list)
+  const { user: workosUser } = useAuth()
+  
+  const retros = useQuery(
+    api.retros.listByWorkosId,
+    workosUser ? { workosId: workosUser.id } : 'skip'
+  )
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString(undefined, {
@@ -23,6 +29,26 @@ export default function MyRetrosPage() {
   }
 
   const loading = retros === undefined
+
+  // If not logged in, redirect to login
+  if (!workosUser) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-12">
+          <div className="max-w-xl mx-auto text-center">
+            <h1 className="text-2xl font-bold mb-4">Sign in to view your retros</h1>
+            <p className="text-muted-foreground mb-6">
+              You need to be signed in to view your retrospectives.
+            </p>
+            <Button asChild size="lg">
+              <Link href="/login">Sign In</Link>
+            </Button>
+          </div>
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -44,8 +70,14 @@ export default function MyRetrosPage() {
               {t('common.loading')}
             </div>
           ) : retros.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              {t('auth.noRetrosYet')}
+            <div className="text-center py-16">
+              <p className="text-muted-foreground mb-6">{t('auth.noRetrosYet')}</p>
+              <Button asChild>
+                <Link href="/create">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create your first retro
+                </Link>
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -61,12 +93,12 @@ export default function MyRetrosPage() {
                         {retro.isClosed ? (
                           <Badge variant="secondary" className="gap-1">
                             <Lock className="w-3 h-3" />
-                            Chiusa
+                            Closed
                           </Badge>
                         ) : (
                           <Badge variant="default" className="gap-1">
                             <Unlock className="w-3 h-3" />
-                            Aperta
+                            Open
                           </Badge>
                         )}
                       </div>
@@ -77,7 +109,7 @@ export default function MyRetrosPage() {
                       <Badge variant="outline">{retro.format}</Badge>
                       <Button asChild variant="ghost" size="sm">
                         <Link href={`/dashboard/${retro.accessCode}`}>
-                          Apri Dashboard
+                          Open Dashboard
                           <ExternalLink className="w-4 h-4 ml-2" />
                         </Link>
                       </Button>

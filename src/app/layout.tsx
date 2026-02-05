@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Nunito_Sans, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
+import { withAuth } from '@workos-inc/authkit-nextjs';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ConvexClientProvider } from '@/components/ConvexClientProvider';
+import { AuthProvider } from '@/components/AuthProvider';
 import "./globals.css";
 
 const nunitoSans = Nunito_Sans({
@@ -39,6 +41,9 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  
+  // Get WorkOS user (null if not authenticated)
+  const { user: workosUser } = await withAuth();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -52,9 +57,11 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <ConvexClientProvider>
-            <NextIntlClientProvider messages={messages}>
-              {children}
-            </NextIntlClientProvider>
+            <AuthProvider workosUser={workosUser}>
+              <NextIntlClientProvider messages={messages}>
+                {children}
+              </NextIntlClientProvider>
+            </AuthProvider>
           </ConvexClientProvider>
         </ThemeProvider>
       </body>

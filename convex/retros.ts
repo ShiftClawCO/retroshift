@@ -50,6 +50,25 @@ export const list = query({
   },
 });
 
+// List user's retros by WorkOS ID (for client-side auth)
+export const listByWorkosId = query({
+  args: { workosId: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))
+      .first();
+
+    if (!user) return [];
+
+    return await ctx.db
+      .query("retros")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .order("desc")
+      .collect();
+  },
+});
+
 // Get retro by access code (public)
 export const getByCode = query({
   args: { code: v.string() },
@@ -93,7 +112,86 @@ export const countByUser = query({
   },
 });
 
-// Create retro
+// Count user's active retros by WorkOS ID (for client-side auth)
+export const countByUserWorkosId = query({
+  args: { workosId: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))
+      .first();
+
+    if (!user) return 0;
+
+    const retros = await ctx.db
+      .query("retros")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .filter((q) => q.eq(q.field("isClosed"), false))
+      .collect();
+
+    return retros.length;
+  },
+});
+
+// Create retro with WorkOS ID (for client-side auth)
+export const createWithWorkosId = mutation({
+  args: {
+    workosId: v.string(),
+    title: v.string(),
+    format: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))
+      .first();
+
+    if (!user) throw new Error("User not found");
+
+    // Check free tier limit
+    if (user.plan === "free") {
+      const activeRetros = await ctx.db
+        .query("retros")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .filter((q) => q.eq(q.field("isClosed"), false))
+        .collect();
+
+      if (activeRetros.length >= 3) {
+        throw new Error("RETRO_LIMIT_REACHED");
+      }
+    }
+
+    // Generate unique access code
+    let accessCode = generateAccessCode();
+    let existing = await ctx.db
+      .query("retros")
+      .withIndex("by_access_code", (q) => q.eq("accessCode", accessCode))
+      .first();
+
+    while (existing) {
+      accessCode = generateAccessCode();
+      existing = await ctx.db
+        .query("retros")
+        .withIndex("by_access_code", (q) => q.eq("accessCode", accessCode))
+        .first();
+    }
+
+    const now = Date.now();
+    const retroId = await ctx.db.insert("retros", {
+      userId: user._id,
+      title: args.title,
+      format: args.format,
+      accessCode,
+      isClosed: false,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    return { retroId, accessCode };
+  },
+});
+
+// Create retro (with Convex auth)
 export const create = mutation({
   args: {
     title: v.string(),

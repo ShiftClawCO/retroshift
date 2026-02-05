@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
+import { useAuth } from '@/components/AuthProvider'
 import { FORMATS, FormatKey } from '@/lib/types'
 import { getCategoryConfig } from '@/lib/category-icons'
 import { Button } from '@/components/ui/button'
@@ -32,19 +33,27 @@ const FREE_RETRO_LIMIT = 3
 export default function CreateRetro() {
   const router = useRouter()
   const t = useTranslations()
+  const { user: workosUser } = useAuth()
+  
   const [title, setTitle] = useState(generateDefaultTitle)
   const [format, setFormat] = useState<FormatKey>('start-stop-continue')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
 
-  // Convex queries & mutations
-  const user = useQuery(api.users.getCurrent)
-  const retroCount = useQuery(api.retros.countByUser) ?? 0
-  const createRetro = useMutation(api.retros.create)
+  // Convex queries & mutations - use workosId from auth
+  const convexUser = useQuery(
+    api.users.getByWorkosId,
+    workosUser ? { workosId: workosUser.id } : 'skip'
+  )
+  const retroCount = useQuery(
+    api.retros.countByUserWorkosId,
+    workosUser ? { workosId: workosUser.id } : 'skip'
+  ) ?? 0
+  const createRetro = useMutation(api.retros.createWithWorkosId)
 
-  const checkingLimit = user === undefined
-  const isPro = user?.plan === 'pro'
+  const checkingLimit = workosUser && convexUser === undefined
+  const isPro = convexUser?.plan === 'pro'
   const limitReached = !isPro && retroCount >= FREE_RETRO_LIMIT
 
   // Keyboard shortcuts
@@ -59,6 +68,11 @@ export default function CreateRetro() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    if (!workosUser) {
+      router.push('/login')
+      return
+    }
+    
     if (!title.trim()) {
       setError(t('create.errorTitle'))
       return
@@ -69,6 +83,7 @@ export default function CreateRetro() {
 
     try {
       const result = await createRetro({
+        workosId: workosUser.id,
         title: title.trim(),
         format,
       })
@@ -80,14 +95,35 @@ export default function CreateRetro() {
       
       if (errorMessage === 'RETRO_LIMIT_REACHED') {
         setError(t('create.limitReached', { count: FREE_RETRO_LIMIT }))
-      } else if (errorMessage === 'Not authenticated') {
-        router.push('/login')
+      } else if (errorMessage === 'User not found') {
+        // User not synced yet, try again
+        setError('Please wait a moment and try again.')
       } else {
         setError(t('create.errorGeneric'))
       }
     } finally {
       setLoading(false)
     }
+  }
+
+  // If not logged in, show prompt to login
+  if (!workosUser) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-12">
+          <div className="max-w-xl mx-auto text-center">
+            <h1 className="text-2xl font-bold mb-4">Sign in to create a retro</h1>
+            <p className="text-muted-foreground mb-6">
+              You need to be signed in to create and manage retrospectives.
+            </p>
+            <Button asChild size="lg">
+              <Link href="/login">Sign In</Link>
+            </Button>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   return (
