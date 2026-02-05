@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Nunito_Sans, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
-import { withAuth } from '@workos-inc/authkit-nextjs';
+import { getUser } from '@/lib/auth';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ConvexClientProvider } from '@/components/ConvexClientProvider';
 import { AuthProvider } from '@/components/AuthProvider';
@@ -43,7 +43,7 @@ export default async function RootLayout({
   const messages = await getMessages();
   
   // Get WorkOS user (null if not authenticated)
-  const { user: workosUser } = await withAuth();
+  const workosUser = await getUser();
 
   return (
     <html lang={locale} suppressHydrationWarning>

@@ -1,11 +1,19 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useAuth } from './AuthProvider'
 import { Button } from '@/components/ui/button'
-import { Zap, Plus, List, LogOut } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Zap, Plus, List, LogOut, User } from 'lucide-react'
 
 export default function Header() {
   const { user: workosUser } = useAuth()
@@ -15,6 +23,8 @@ export default function Header() {
   )
   
   const isLoggedIn = !!workosUser
+  const displayName = workosUser?.firstName || workosUser?.email?.split('@')[0] || 'User'
+  const avatarUrl = workosUser?.profilePictureUrl
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -39,11 +49,40 @@ export default function Header() {
                   New Retro
                 </Link>
               </Button>
-              <form action="/auth/signout" method="GET">
-                <Button variant="ghost" size="sm" type="submit">
-                  <LogOut className="w-4 h-4" />
-                </Button>
-              </form>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2 px-2">
+                    {avatarUrl ? (
+                      <Image
+                        src={avatarUrl}
+                        alt={displayName}
+                        width={28}
+                        height={28}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                        <User className="w-4 h-4 text-primary" />
+                      </div>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <div className="px-2 py-1.5 text-sm font-medium">
+                    {displayName}
+                  </div>
+                  <div className="px-2 pb-1.5 text-xs text-muted-foreground">
+                    {workosUser?.email}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <a href="/auth/signout" className="cursor-pointer">
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign out
+                    </a>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : (
             <>
