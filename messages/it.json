@@ -236,6 +236,10 @@
     "faq3Q": "Serve una carta di credito per il piano Free?",
     "faq3A": "No. Il piano Free è completamente gratuito, nessuna carta richiesta.",
     "faq4Q": "Posso cambiare piano?",
-    "faq4A": "Sì, upgrade o downgrade in qualsiasi momento. Gli upgrade sono immediati, i downgrade al prossimo ciclo di fatturazione."
+    "faq4A": "Sì, upgrade o downgrade in qualsiasi momento. Gli upgrade sono immediati, i downgrade al prossimo ciclo di fatturazione.",
+    "loginToUpgrade": "Accedi per fare upgrade",
+    "upgradeToPro": "Passa a Pro",
+    "manageSubscription": "Gestisci Abbonamento",
+    "cancelAnytime": "Cancella quando vuoi. Nessuna domanda."
   }
 }

@@ -236,6 +236,10 @@
     "faq3Q": "Do I need a credit card for the free plan?",
     "faq3A": "No. The free plan is completely free, no credit card required.",
     "faq4Q": "Can I switch between plans?",
-    "faq4A": "Yes, upgrade or downgrade anytime. Upgrades take effect immediately, downgrades at the next billing cycle."
+    "faq4A": "Yes, upgrade or downgrade anytime. Upgrades take effect immediately, downgrades at the next billing cycle.",
+    "loginToUpgrade": "Sign in to upgrade",
+    "upgradeToPro": "Upgrade to Pro",
+    "manageSubscription": "Manage Subscription",
+    "cancelAnytime": "Cancel anytime. No questions asked."
   }
 }

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
+    "@stripe/stripe-js": "^8.7.0",
     "@workos-inc/authkit-nextjs": "^2.13.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -28,6 +29,7 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "stripe": "^20.3.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7"
   },
