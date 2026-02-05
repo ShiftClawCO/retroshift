@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useAuth } from './AuthProvider'
@@ -47,12 +46,14 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2 px-2">
                     {avatarUrl ? (
-                      <Image
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
                         src={avatarUrl}
                         alt={displayName}
                         width={28}
                         height={28}
                         className="rounded-full"
+                        referrerPolicy="no-referrer"
                       />
                     ) : (
                       <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
