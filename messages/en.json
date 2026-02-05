@@ -42,7 +42,6 @@
     "heroSolution": "RetroShift fixes this: anonymous feedback, async, no awkward silences.",
     "cta": "Create your first Retro — Free",
     "ctaSub": "Setup in 30 seconds. No credit card required.",
-    
     "painTitle": "Sound familiar?",
     "pain1Title": "Silence on calls",
     "pain1Desc": "\"Anyone have anything to add?\" *crickets*",
@@ -50,7 +49,6 @@
     "pain2Desc": "Two people talk, everyone else stays quiet.",
     "pain3Title": "Watered-down feedback",
     "pain3Desc": "Nobody says what they really think.",
-    
     "solutionTitle": "The solution: anonymous, async feedback",
     "solution1Title": "Real anonymity",
     "solution1Desc": "Your team writes what they really think. No names, no judgment.",
@@ -58,7 +56,6 @@
     "solution2Desc": "No forced calls. Everyone responds when they have time to reflect.",
     "solution3Title": "All aggregated",
     "solution3Desc": "See patterns, not personalities. Focus on real issues.",
-    
     "howItWorks": "How it works",
     "step1Title": "Create the retro",
     "step1Desc": "Pick a format, give it a name. 30 seconds.",
@@ -66,14 +63,12 @@
     "step2Desc": "Slack, Teams, email. Team doesn't need to sign up.",
     "step3Title": "Collect feedback",
     "step3Desc": "See responses in real-time. Anonymous and honest.",
-    
     "comparisonTitle": "Why not use other tools?",
     "comparisonIntro": "You could. But...",
     "comp1": "Enterprise tools cost $10+/user/month — and you don't need 90% of the features",
     "comp2": "Most tools require accounts for everyone — friction kills participation",
     "comp3": "Shared boards aren't truly anonymous — you can see who writes what",
     "comparisonConclusion": "RetroShift: one link, zero logins, real anonymity.",
-    
     "pricingTitle": "Simple pricing",
     "pricingFreeTitle": "Free",
     "pricingFreeDesc": "Perfect to get started",
@@ -86,7 +81,6 @@
     "pricingFree5": "AI-powered summary",
     "pricingFreeCta": "Get Started Free →",
     "pricingPopular": "Most Popular",
-    
     "pricingProTitle": "Pro",
     "pricingProDesc": "For teams that run retros regularly",
     "pricingProPrice": "€9",
@@ -97,7 +91,6 @@
     "pricingPro4": "Full history",
     "pricingPro5": "Permanent links",
     "pricingProCta": "Upgrade to Pro →",
-    
     "faqTitle": "FAQ",
     "faq1Q": "Is it really anonymous?",
     "faq1A": "Yes. We don't track IPs, don't require logins. Even we don't know who wrote what.",
@@ -107,10 +100,8 @@
     "faq3A": "It's built for that. Async = different timezones, no problem.",
     "faq4Q": "Is my data safe?",
     "faq4A": "EU hosting, encrypted database, no selling data to third parties.",
-    
     "finalCta": "Ready to find out what your team really thinks?",
     "finalCtaButton": "Create a Free Retro →",
-    
     "footer": "Made with 🦞 by",
     "formats": "Available formats"
   },
@@ -214,7 +205,6 @@
     "currentPlan": "Current plan",
     "popular": "Most Popular",
     "processing": "Processing...",
-    
     "freeName": "Free",
     "freeDesc": "Perfect for small teams trying retrospectives",
     "free1": "Up to 3 active retros",
@@ -223,7 +213,6 @@
     "free4": "Links valid for 7 days",
     "free5": "AI-powered summaries",
     "freeCta": "Get Started Free",
-    
     "proName": "Pro",
     "proDesc": "For teams running regular retrospectives",
     "pro1": "Unlimited retros",
@@ -232,7 +221,6 @@
     "pro4": "Full history",
     "pro5": "Permanent links",
     "proCta": "Upgrade to Pro",
-    
     "faqTitle": "Frequently Asked Questions",
     "faq1Q": "Can I cancel anytime?",
     "faq1A": "Yes! Cancel with one click from your account. You'll keep access until the end of your billing period.",
@@ -246,5 +234,8 @@
     "upgradeToPro": "Upgrade to Pro",
     "manageSubscription": "Manage Subscription",
     "cancelAnytime": "Cancel anytime. No questions asked."
+  },
+  "myRetros": {
+    "upgradeSuccess": "Welcome to Pro! You now have unlimited retros, participants, and all premium features."
   }
 }

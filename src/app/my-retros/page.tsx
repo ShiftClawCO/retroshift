@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useQuery } from 'convex/react'
@@ -8,13 +10,24 @@ import { useAuth } from '@/components/AuthProvider'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import Header from '@/components/Header'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Plus, ExternalLink, Lock, Unlock, FolderOpen } from 'lucide-react'
+import { Plus, ExternalLink, Lock, Unlock, FolderOpen, PartyPopper, X } from 'lucide-react'
 
 export default function MyRetrosPage() {
   const t = useTranslations()
   const { user: workosUser } = useAuth()
+  const searchParams = useSearchParams()
+  const [showUpgradeBanner, setShowUpgradeBanner] = useState(false)
+
+  useEffect(() => {
+    if (searchParams.get('upgraded') === 'true') {
+      setShowUpgradeBanner(true)
+      // Clean URL without reload
+      window.history.replaceState({}, '', '/my-retros')
+    }
+  }, [searchParams])
   
   const retros = useQuery(
     api.retros.listByWorkosId,
@@ -57,6 +70,26 @@ export default function MyRetrosPage() {
 
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
+          {/* Upgrade success banner */}
+          {showUpgradeBanner && (
+            <Alert className="mb-6 border-green-500 bg-green-500/10">
+              <PartyPopper className="h-4 w-4 text-green-500" />
+              <AlertDescription className="flex items-center justify-between">
+                <span className="font-medium">
+                  {t('myRetros.upgradeSuccess')} 🎉
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 shrink-0"
+                  onClick={() => setShowUpgradeBanner(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold">{t('auth.myRetros')}</h1>
             <Button asChild size="icon" className="h-10 w-10 rounded-full">

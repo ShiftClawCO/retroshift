@@ -51,7 +51,7 @@ export interface Subscription {
   updatedAt: number;
 }
 
-// Format definitions (kept from supabase.ts)
+// Retro format definitions
 export const FORMATS = {
   'start-stop-continue': {
     name: 'Start / Stop / Continue',
