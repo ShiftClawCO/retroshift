@@ -83,20 +83,20 @@ add_static() {
 }
 
 # WorkOS
-add_env "WORKOS_API_KEY" "claw-workos-api-key" "encrypted"
-add_env "WORKOS_CLIENT_ID" "claw-workos-client-id" "encrypted"
-add_env "WORKOS_COOKIE_PASSWORD" "claw-workos-cookie-password" "encrypted"
+add_env "WORKOS_API_KEY" "claw-retroshift-workos-api-key" "encrypted"
+add_env "WORKOS_CLIENT_ID" "claw-retroshift-workos-client-id" "encrypted"
+add_env "WORKOS_COOKIE_PASSWORD" "claw-retroshift-workos-cookie-password" "encrypted"
 
 # Stripe
-add_env "STRIPE_SECRET_KEY" "claw-stripe-secret-key" "encrypted"
-add_env "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" "claw-stripe-publishable-key" "plain"
-add_env "STRIPE_WEBHOOK_SECRET" "claw-stripe-webhook-secret" "encrypted"
-add_env "STRIPE_PRICE_ID" "claw-stripe-price-id" "encrypted"
+add_env "STRIPE_SECRET_KEY" "claw-retroshift-stripe-secret-key" "encrypted"
+add_env "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" "claw-retroshift-stripe-publishable-key" "plain"
+add_env "STRIPE_WEBHOOK_SECRET" "claw-retroshift-stripe-webhook-secret" "encrypted"
+add_env "STRIPE_PRICE_ID" "claw-retroshift-stripe-price-id" "encrypted"
 
 # Convex
-add_env "NEXT_PUBLIC_CONVEX_URL" "claw-convex-url" "plain"
+add_env "NEXT_PUBLIC_CONVEX_URL" "claw-retroshift-convex-url" "plain"
 
-# Groq
+# Groq (globale)
 add_env "GROQ_API_KEY" "claw-groq-api-key" "encrypted"
 
 # Static

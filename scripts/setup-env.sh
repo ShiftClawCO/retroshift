@@ -41,18 +41,18 @@ set_env_literal() {
 
 echo ""
 echo "📦 Production environment..."
-set_env_from_keychain "WORKOS_API_KEY" "claw-workos-api-key-prod" "production"
-set_env_from_keychain "WORKOS_CLIENT_ID" "claw-workos-client-id-prod" "production"
-set_env_from_keychain "WORKOS_COOKIE_PASSWORD" "claw-workos-cookie-password" "production"
-set_env_from_keychain "NEXT_PUBLIC_CONVEX_URL" "claw-convex-url-prod" "production"
+set_env_from_keychain "WORKOS_API_KEY" "claw-retroshift-workos-api-key-prod" "production"
+set_env_from_keychain "WORKOS_CLIENT_ID" "claw-retroshift-workos-client-id-prod" "production"
+set_env_from_keychain "WORKOS_COOKIE_PASSWORD" "claw-retroshift-workos-cookie-password" "production"
+set_env_from_keychain "NEXT_PUBLIC_CONVEX_URL" "claw-retroshift-convex-url-prod" "production"
 set_env_literal "WORKOS_REDIRECT_URI" "https://retroshift.vercel.app/auth/callback" "production"
 
 echo ""
 echo "🧪 Preview & Development environments..."
-set_env_from_keychain "WORKOS_API_KEY" "claw-workos-api-key-staging" "preview development"
-set_env_from_keychain "WORKOS_CLIENT_ID" "claw-workos-client-id-staging" "preview development"
-set_env_from_keychain "WORKOS_COOKIE_PASSWORD" "claw-workos-cookie-password" "preview development"
-set_env_from_keychain "NEXT_PUBLIC_CONVEX_URL" "claw-convex-url-dev" "preview development"
+set_env_from_keychain "WORKOS_API_KEY" "claw-retroshift-workos-api-key-staging" "preview development"
+set_env_from_keychain "WORKOS_CLIENT_ID" "claw-retroshift-workos-client-id-staging" "preview development"
+set_env_from_keychain "WORKOS_COOKIE_PASSWORD" "claw-retroshift-workos-cookie-password" "preview development"
+set_env_from_keychain "NEXT_PUBLIC_CONVEX_URL" "claw-retroshift-convex-url-dev" "preview development"
 # Note: Preview redirect URI is tricky - each preview has different URL
 # For now, staging WorkOS should have the dev URL registered
 set_env_literal "WORKOS_REDIRECT_URI" "http://localhost:3000/auth/callback" "development"
