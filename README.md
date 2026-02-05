@@ -1,54 +1,104 @@
-# 🔄 RetroShift
+# RetroShift
 
-Retrospettive anonime e asincrone per team agile.
+Async, anonymous retrospectives for agile teams. Create retros, share an access code, collect feedback and votes — no login required for participants.
 
 ## Features
 
-- **Anonimato**: Il team può esprimersi liberamente
-- **Async**: Ognuno risponde quando vuole
-- **Formati multipli**: Start/Stop/Continue, Mad/Sad/Glad, Liked/Learned/Lacked
-- **Real-time**: I feedback appaiono in tempo reale nella dashboard
-- **Zero friction**: Nessun login richiesto per partecipare
-
-## Quick Start
-
-### 1. Setup Supabase
-
-1. Crea un nuovo progetto su [supabase.com](https://supabase.com)
-2. Vai su SQL Editor ed esegui `supabase/schema.sql`
-3. Copia URL e anon key dal progetto
-
-### 2. Configura l'ambiente
-
-```bash
-cp .env.example .env.local
-# Modifica .env.local con i tuoi valori Supabase
-```
-
-### 3. Installa e avvia
-
-```bash
-npm install
-npm run dev
-```
-
-Apri [http://localhost:3000](http://localhost:3000)
+- **Anonymous** — participants express themselves freely
+- **Async** — everyone responds on their own time
+- **Multiple formats** — Start/Stop/Continue, Mad/Sad/Glad, Liked/Learned/Lacked
+- **Real-time** — feedback appears instantly via Convex live queries
+- **Zero friction** — no login required to participate (access code only)
+- **AI summaries** — Groq-powered retro summaries (Pro)
+- **PDF export** — download retro reports (Pro)
+- **Stripe billing** — free tier + Pro with checkout and customer portal
+- **i18n** — English and Italian
 
 ## Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Styling**: Tailwind CSS
-- **Database**: Supabase (PostgreSQL)
-- **Deploy**: Vercel
+| Layer | Tech |
+|-------|------|
+| Framework | Next.js 16 (App Router, Turbopack) |
+| Language | TypeScript (strict) |
+| UI | shadcn/ui + Tailwind v4 + Lucide icons |
+| Database | Convex (realtime, type-safe) |
+| Auth | WorkOS AuthKit (Google OAuth + email/password) |
+| Payments | Stripe (checkout + webhook + portal) |
+| AI | Groq (Llama 3.3 70B) |
+| i18n | next-intl (EN + IT) |
+| Deploy | Vercel |
 
-## Roadmap
+## Getting started
 
-- [ ] Voting sui feedback
-- [ ] Export PDF
-- [ ] Storico retro
-- [ ] Timer countdown
-- [ ] Integrazione Slack/Teams
+### Prerequisites
+
+- Node.js 20+
+- A [Convex](https://convex.dev) project
+- A [WorkOS](https://workos.com) account with AuthKit configured
+- A [Stripe](https://stripe.com) account with products/prices set up
+- A [Groq](https://groq.com) API key
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment
+
+Copy `.env.example` to `.env.local` and fill in:
+
+```
+# Convex
+CONVEX_DEPLOYMENT=...
+NEXT_PUBLIC_CONVEX_URL=...
+
+# WorkOS
+WORKOS_API_KEY=...
+WORKOS_CLIENT_ID=...
+WORKOS_COOKIE_PASSWORD=...
+NEXT_PUBLIC_WORKOS_REDIRECT_URI=...
+
+# Stripe
+STRIPE_SECRET_KEY=...
+STRIPE_WEBHOOK_SECRET=...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=...
+
+# Groq
+GROQ_API_KEY=...
+```
+
+### 3. Start Convex
+
+```bash
+npx convex dev
+```
+
+### 4. Run the app
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint check |
+| `npm test` | Playwright tests |
+| `npx convex dev` | Convex dev mode |
+
+## Architecture
+
+- **Auth flow**: WorkOS AuthKit → custom JWT bridge → Convex identity
+- **RLS**: centralized rules in `convex/rules.ts` → `queryWithRLS` / `mutationWithRLS`
+- **Payments**: Stripe webhook → Next.js API route → Convex internal mutations
+- **Schema**: `convex/schema.ts`
 
 ---
 
-Made with 🦞 by [Shiftclaw](https://shiftclaw.com)
+Made with Shiftclaw
