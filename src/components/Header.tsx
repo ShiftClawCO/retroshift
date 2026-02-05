@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Zap, Plus, List, LogOut, User } from 'lucide-react'
+import { Zap, List, LogOut, User } from 'lucide-react'
 
 export default function Header() {
   const { user: workosUser } = useAuth()
@@ -41,12 +41,6 @@ export default function Header() {
                 <Link href="/my-retros">
                   <List className="w-4 h-4 mr-2" />
                   My Retros
-                </Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href="/create">
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Retro
                 </Link>
               </Button>
               <DropdownMenu>
