@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Header from '@/components/Header'
-import { Plus, ExternalLink, Lock, Unlock } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Plus, ExternalLink, Lock, Unlock, FolderOpen } from 'lucide-react'
 
 export default function MyRetrosPage() {
   const t = useTranslations()
@@ -66,13 +67,35 @@ export default function MyRetrosPage() {
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-muted-foreground">
-              {t('common.loading')}
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <Card key={i}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-2">
+                        <Skeleton className="h-5 w-48" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                      <Skeleton className="h-6 w-16" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-5 w-32" />
+                      <Skeleton className="h-8 w-32" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           ) : retros.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground mb-6">{t('auth.noRetrosYet')}</p>
-              <Button asChild>
+            <div className="flex flex-col items-center justify-center py-16">
+              <FolderOpen className="h-16 w-16 text-muted-foreground mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No retrospectives yet</h3>
+              <p className="text-muted-foreground text-center max-w-sm mb-6">
+                {t('auth.noRetrosYet')}
+              </p>
+              <Button asChild size="lg">
                 <Link href="/create">
                   <Plus className="w-4 h-4 mr-2" />
                   Create your first retro

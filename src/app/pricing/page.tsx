@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -30,10 +31,11 @@ export default function PricingPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        console.error("No checkout URL returned");
+        toast.error("Failed to start checkout. Please try again.");
       }
     } catch (err) {
       console.error("Checkout error:", err);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(null);
     }
@@ -48,10 +50,11 @@ export default function PricingPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        console.error("No portal URL returned");
+        toast.error("Failed to open billing portal. Please try again.");
       }
     } catch (err) {
       console.error("Portal error:", err);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(null);
     }
