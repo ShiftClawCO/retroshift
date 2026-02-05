@@ -105,6 +105,35 @@ export default function DashboardPage() {
     )
   }
 
+  // Ownership check: only the retro creator can see the dashboard
+  const ownershipLoading = workosUser && convexUser === undefined
+  const isOwner = convexUser && retro.userId === convexUser._id
+
+  if (ownershipLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">{t('common.loading')}</div>
+      </div>
+    )
+  }
+
+  if (!workosUser || !isOwner) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="text-center p-6 max-w-md">
+          <CardContent>
+            <Lock className="w-8 h-8 text-destructive mx-auto mb-4" />
+            <div className="text-destructive font-semibold mb-2">{t('dashboard.accessDenied')}</div>
+            <div className="text-muted-foreground text-sm mb-4">{t('dashboard.accessDeniedDesc')}</div>
+            <Button asChild variant="outline">
+              <Link href="/">{t('common.backHome')}</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   const format = FORMATS[retro.format as FormatKey]
   const entriesList = entries || []
   const votesList = allVotes || []

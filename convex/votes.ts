@@ -1,10 +1,20 @@
-import { query, mutation } from "./_generated/server";
+import { mutation } from "./_generated/server";
+import { queryWithRLS } from "./functions";
 import { v } from "convex/values";
 
-// List votes by entry
-export const listByEntry = query({
+// ─── Authenticated endpoints (RLS-protected) ──────────────
+// These read endpoints are used by the retro owner on the dashboard.
+// RLS ensures only the retro owner can see votes (via entry → retro chain).
+
+/**
+ * List votes by entry.
+ * Previously had NO auth check — now secured via RLS.
+ */
+export const listByEntry = queryWithRLS({
   args: { entryId: v.id("entries") },
   handler: async (ctx, args) => {
+    if (!ctx.user) return [];
+
     return await ctx.db
       .query("votes")
       .withIndex("by_entry", (q) => q.eq("entryId", args.entryId))
@@ -12,10 +22,15 @@ export const listByEntry = query({
   },
 });
 
-// List votes for multiple entries (batch)
-export const listByEntries = query({
+/**
+ * List votes for multiple entries (batch).
+ * Previously had NO auth check — now secured via RLS.
+ */
+export const listByEntries = queryWithRLS({
   args: { entryIds: v.array(v.id("entries")) },
   handler: async (ctx, args) => {
+    if (!ctx.user) return [];
+
     const allVotes = [];
     for (const entryId of args.entryIds) {
       const votes = await ctx.db
@@ -28,13 +43,18 @@ export const listByEntries = query({
   },
 });
 
-// Get vote by participant for an entry
-export const getByParticipant = query({
+/**
+ * Get vote by participant for an entry.
+ * Previously had NO auth check — now secured via RLS.
+ */
+export const getByParticipant = queryWithRLS({
   args: {
     entryId: v.id("entries"),
     participantId: v.string(),
   },
   handler: async (ctx, args) => {
+    if (!ctx.user) return null;
+
     return await ctx.db
       .query("votes")
       .withIndex("by_participant", (q) =>
@@ -44,12 +64,51 @@ export const getByParticipant = query({
   },
 });
 
-// Upsert vote (create or update)
+/**
+ * Get vote summary for an entry.
+ * Previously had NO auth check — now secured via RLS.
+ */
+export const getSummary = queryWithRLS({
+  args: { entryId: v.id("entries") },
+  handler: async (ctx, args) => {
+    if (!ctx.user) return { upvotes: 0, downvotes: 0, total: 0, count: 0 };
+
+    const votes = await ctx.db
+      .query("votes")
+      .withIndex("by_entry", (q) => q.eq("entryId", args.entryId))
+      .collect();
+
+    let upvotes = 0;
+    let downvotes = 0;
+
+    for (const vote of votes) {
+      if (vote.value > 0) upvotes++;
+      else if (vote.value < 0) downvotes++;
+    }
+
+    return {
+      upvotes,
+      downvotes,
+      total: upvotes - downvotes,
+      count: votes.length,
+    };
+  },
+});
+
+// ─── Public endpoints (no RLS) ─────────────────────────────
+// These are used by anonymous participants to vote.
+// Participants are identified by participantId (client-generated UUID).
+
+/**
+ * Upsert vote (create or update).
+ * Public — for participants. No RLS.
+ * Validates entry exists and retro is not closed.
+ */
 export const upsert = mutation({
   args: {
     entryId: v.id("entries"),
     participantId: v.string(),
-    value: v.number(), // 1 for upvote, -1 for downvote, 0 to remove
+    value: v.number(),
   },
   handler: async (ctx, args) => {
     // Verify entry exists
@@ -102,7 +161,10 @@ export const upsert = mutation({
   },
 });
 
-// Remove vote
+/**
+ * Remove vote.
+ * Public — for participants. No RLS.
+ */
 export const remove = mutation({
   args: {
     entryId: v.id("entries"),
@@ -121,31 +183,5 @@ export const remove = mutation({
       return true;
     }
     return false;
-  },
-});
-
-// Get vote summary for an entry
-export const getSummary = query({
-  args: { entryId: v.id("entries") },
-  handler: async (ctx, args) => {
-    const votes = await ctx.db
-      .query("votes")
-      .withIndex("by_entry", (q) => q.eq("entryId", args.entryId))
-      .collect();
-
-    let upvotes = 0;
-    let downvotes = 0;
-
-    for (const vote of votes) {
-      if (vote.value > 0) upvotes++;
-      else if (vote.value < 0) downvotes++;
-    }
-
-    return {
-      upvotes,
-      downvotes,
-      total: upvotes - downvotes,
-      count: votes.length,
-    };
   },
 });

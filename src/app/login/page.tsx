@@ -1,9 +1,9 @@
 import { getSignInUrl } from '@workos-inc/authkit-nextjs';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap } from 'lucide-react';
+import EmailSignInForm from '@/components/EmailSignInForm';
 
 export default async function LoginPage() {
   const signInUrl = await getSignInUrl();
@@ -44,6 +44,19 @@ export default async function LoginPage() {
               Continue with Google
             </a>
           </Button>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">or</span>
+            </div>
+          </div>
+
+          {/* Email sign-in form */}
+          <EmailSignInForm signInUrl={signInUrl} />
           
           <div className="text-center text-sm text-muted-foreground">
             Don't have an account?{' '}

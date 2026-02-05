@@ -30,7 +30,10 @@
     "noRetrosYet": "No retros yet. Click + to create your first one.",
     "pricing": "Pricing",
     "orContinueWith": "or continue with",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
+    "continueWithEmail": "Continue with email",
+    "emailPlaceholder": "name@example.com",
+    "or": "or"
   },
   "home": {
     "title": "RetroShift",
@@ -153,7 +156,9 @@
     "copy": "Copy",
     "noFeedback": "No feedback yet",
     "responses": "{count} responses",
-    "autoRefresh": "New feedback will appear automatically"
+    "autoRefresh": "New feedback will appear automatically",
+    "accessDenied": "Access Denied",
+    "accessDeniedDesc": "You don't have permission to view this retrospective."
   },
   "formats": {
     "start-stop-continue": {
