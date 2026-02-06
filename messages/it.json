@@ -244,5 +244,13 @@
   },
   "myRetros": {
     "upgradeSuccess": "Benvenuto in Pro! Ora hai retro illimitate, partecipanti illimitati e tutte le funzionalità premium."
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Approfondimenti su retrospettive asincrone, feedback di team e collaborazione remota.",
+    "readMore": "Leggi di più",
+    "readTime": "{minutes} min di lettura",
+    "backToBlog": "Torna al blog",
+    "noPosts": "Nessun articolo ancora. Torna presto!"
   }
 }

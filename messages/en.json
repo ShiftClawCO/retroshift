@@ -244,5 +244,13 @@
   },
   "myRetros": {
     "upgradeSuccess": "Welcome to Pro! You now have unlimited retros, participants, and all premium features."
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Insights on async retrospectives, team feedback, and remote collaboration.",
+    "readMore": "Read more",
+    "readTime": "{minutes} min read",
+    "backToBlog": "Back to blog",
+    "noPosts": "No blog posts yet. Check back soon!"
   }
 }
