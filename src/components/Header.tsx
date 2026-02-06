@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Zap, List, LogOut, User } from 'lucide-react'
+import { Zap, List, LogOut, User, Settings } from 'lucide-react'
 
 export default function Header() {
   const { user: workosUser } = useAuth()
@@ -70,6 +70,12 @@ export default function Header() {
                     {workosUser?.email}
                   </div>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="cursor-pointer">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <a href="/auth/signout" className="cursor-pointer">
                       <LogOut className="w-4 h-4 mr-2" />
