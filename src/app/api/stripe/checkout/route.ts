@@ -7,25 +7,26 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST() {
   const user = await getUser();
-  
+
   if (!user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Get or create Stripe customer
-  const convexUser = await convex.query(api.users.getByWorkosId, { 
-    workosId: user.id 
+  // Use action (not RLS query) — API routes don't have Convex auth tokens.
+  // Security: getUser() above verifies the WorkOS session cookie.
+  const convexUser = await convex.action(api.userActions.getUserByWorkosId, {
+    workosId: user.id,
   });
-  
+
   let customerId = convexUser?.stripeCustomerId;
-  
+
   if (!customerId) {
     const customer = await stripe.customers.create({
       email: user.email,
       metadata: { workosId: user.id },
     });
     customerId = customer.id;
-    
+
     // Use Convex action that calls internal mutation
     await convex.action(api.stripe.linkStripeCustomer, {
       workosId: user.id,

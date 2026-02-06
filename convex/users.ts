@@ -38,7 +38,27 @@ export const getCurrent = queryWithRLS({
   },
 });
 
-// ─── Server-side / webhook endpoints (no RLS) ─────────────
+// ─── Server-side / webhook / action endpoints (no RLS) ────
+// These are called from Convex actions and validated by the calling
+// API route (WorkOS session or Stripe signature). They need
+// unrestricted db access.
+
+/**
+ * Get user by WorkOS ID.
+ * Internal only — called from Convex actions after API route has
+ * verified the WorkOS session cookie.
+ */
+export const getByWorkosIdInternal = internalQuery({
+  args: { workosId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_workos_id", (q) => q.eq("workosId", args.workosId))
+      .first();
+  },
+});
+
+// ─── Stripe / webhook internal endpoints ──────────────────
 // These are called from Stripe webhooks and validated by signature.
 // They need unrestricted db access.
 
