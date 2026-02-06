@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight, Calendar, User, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Footer from '@/components/Footer'
 
 export const metadata = {
   title: 'Blog | RetroShift',
@@ -107,16 +108,7 @@ export default async function BlogPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-8 text-center text-muted-foreground text-sm border-t">
-        <div className="container mx-auto px-4">
-          <p>
-            Made with 🦞 by{' '}
-            <a href="https://shiftclaw.com" className="text-foreground hover:underline">
-              Shiftclaw
-            </a>
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

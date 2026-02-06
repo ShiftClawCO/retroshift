@@ -5,6 +5,7 @@ import { getBlogPost, getAllBlogSlugs } from '@/lib/blog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Calendar, User, Clock, Zap } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>
@@ -186,16 +187,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       </main>
 
       {/* Footer */}
-      <footer className="py-8 text-center text-muted-foreground text-sm border-t mt-16">
-        <div className="container mx-auto px-4">
-          <p>
-            Made with 🦞 by{' '}
-            <a href="https://shiftclaw.com" className="text-foreground hover:underline">
-              Shiftclaw
-            </a>
-          </p>
-        </div>
-      </footer>
+      <Footer className="mt-16" />
     </div>
   )
 }

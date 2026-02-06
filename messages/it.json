@@ -253,6 +253,13 @@
     "backToBlog": "Torna al blog",
     "noPosts": "Nessun articolo ancora. Torna presto!"
   },
+  "footer": {
+    "madeWith": "Made with 🦞 by",
+    "privacy": "Privacy Policy",
+    "terms": "Termini di Servizio",
+    "contact": "Contatti",
+    "blog": "Blog"
+  },
   "settings": {
     "title": "Impostazioni",
     "profile": "Profilo",
