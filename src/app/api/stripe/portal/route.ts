@@ -7,12 +7,14 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST() {
   const user = await getUser();
-  
+
   if (!user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const convexUser = await convex.query(api.users.getByWorkosId, {
+  // Use action (not RLS query) — API routes don't have Convex auth tokens.
+  // Security: getUser() above verifies the WorkOS session cookie.
+  const convexUser = await convex.action(api.userActions.getUserByWorkosId, {
     workosId: user.id,
   });
 
