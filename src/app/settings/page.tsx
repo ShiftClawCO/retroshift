@@ -63,7 +63,7 @@ export default function SettingsPage() {
 
   // Check if subscription is set to cancel at period end
   const isCancelingAtPeriodEnd =
-    hasActiveSubscription && subscription.status === 'active'
+    hasActiveSubscription && subscription.cancelAtPeriodEnd === true
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString(undefined, {
@@ -239,9 +239,13 @@ export default function SettingsPage() {
                         {hasActiveSubscription && subscription.currentPeriodEnd && (
                           <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                             <Calendar className="w-3.5 h-3.5" />
-                            {t('settings.renewsOn', {
-                              date: formatDate(subscription.currentPeriodEnd),
-                            })}
+                            {isCancelingAtPeriodEnd
+                              ? t('settings.cancelsOn', {
+                                  date: formatDate(subscription.currentPeriodEnd),
+                                })
+                              : t('settings.renewsOn', {
+                                  date: formatDate(subscription.currentPeriodEnd),
+                                })}
                           </p>
                         )}
                       </div>
