@@ -102,6 +102,7 @@ export const update = internalMutation({
     stripeSubscriptionId: v.string(),
     status: v.optional(v.string()),
     currentPeriodEnd: v.optional(v.number()),
+    cancelAtPeriodEnd: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const subscription = await ctx.db
@@ -119,6 +120,8 @@ export const update = internalMutation({
     if (args.status !== undefined) updates.status = args.status;
     if (args.currentPeriodEnd !== undefined)
       updates.currentPeriodEnd = args.currentPeriodEnd;
+    if (args.cancelAtPeriodEnd !== undefined)
+      updates.cancelAtPeriodEnd = args.cancelAtPeriodEnd;
 
     await ctx.db.patch(subscription._id, updates);
     return subscription._id;

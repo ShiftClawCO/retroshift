@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useAuth } from './AuthProvider'
@@ -12,9 +13,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Zap, List, LogOut, User } from 'lucide-react'
+import { Zap, List, LogOut, User, Settings } from 'lucide-react'
 
 export default function Header() {
+  const t = useTranslations()
   const { user: workosUser } = useAuth()
   const convexUser = useQuery(
     api.users.getByWorkosId,
@@ -70,6 +72,12 @@ export default function Header() {
                     {workosUser?.email}
                   </div>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="cursor-pointer">
+                      <Settings className="w-4 h-4 mr-2" />
+                      {t('settings.title')}
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <a href="/auth/signout" className="cursor-pointer">
                       <LogOut className="w-4 h-4 mr-2" />

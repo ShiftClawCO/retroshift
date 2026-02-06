@@ -244,5 +244,49 @@
   },
   "myRetros": {
     "upgradeSuccess": "Benvenuto in Pro! Ora hai retro illimitate, partecipanti illimitati e tutte le funzionalità premium."
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Approfondimenti su retrospettive asincrone, feedback di team e collaborazione remota.",
+    "readMore": "Leggi di più",
+    "readTime": "{minutes} min di lettura",
+    "backToBlog": "Torna al blog",
+    "noPosts": "Nessun articolo ancora. Torna presto!"
+  },
+  "footer": {
+    "madeWith": "Made with 🦞 by",
+    "privacy": "Privacy Policy",
+    "terms": "Termini di Servizio",
+    "contact": "Contatti",
+    "blog": "Blog"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "profile": "Profilo",
+    "profileDesc": "Le informazioni del tuo account",
+    "subscription": "Abbonamento",
+    "subscriptionDesc": "Gestisci il tuo abbonamento e la fatturazione",
+    "currentPlan": "Piano attuale",
+    "freePlan": "Piano Free",
+    "proPlan": "Piano Pro",
+    "renewsOn": "Si rinnova il {date}",
+    "cancelsOn": "Termina il {date}",
+    "proFeatures": "Le tue funzionalità Pro:",
+    "managePayment": "Gestisci metodo di pagamento",
+    "cancelSubscription": "Annulla abbonamento",
+    "upgradeToPro": "Passa a Pro",
+    "signInRequired": "Accesso richiesto",
+    "signInRequiredDesc": "Devi accedere per visualizzare le impostazioni.",
+    "cancelDialogTitle": "Annullare l'abbonamento?",
+    "cancelDialogDesc": "Sei sicuro di voler annullare l'abbonamento Pro? Ecco cosa succederà:",
+    "cancelDialogPoint1": "Manterrai l'accesso Pro fino alla fine del periodo di fatturazione",
+    "cancelDialogPoint2": "I tuoi dati saranno conservati (retro, feedback, storico)",
+    "cancelDialogPoint3": "Puoi riabbonarti in qualsiasi momento per riavere le funzionalità Pro",
+    "keepSubscription": "Mantieni abbonamento",
+    "confirmCancel": "Sì, annulla",
+    "canceling": "Annullamento...",
+    "cancelSuccess": "Abbonamento annullato",
+    "cancelSuccessDesc": "L'accesso Pro terminerà il {date}. Puoi riabbonarti quando vuoi.",
+    "cancelError": "Annullamento fallito"
   }
 }

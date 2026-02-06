@@ -52,6 +52,7 @@ export const handleSubscriptionUpdated = action({
     stripeSubscriptionId: v.string(),
     status: v.optional(v.string()),
     currentPeriodEnd: v.optional(v.number()),
+    cancelAtPeriodEnd: v.optional(v.boolean()),
     stripeCustomerId: v.string(),
     plan: v.union(v.literal("free"), v.literal("pro")),
   },
@@ -61,6 +62,7 @@ export const handleSubscriptionUpdated = action({
         stripeSubscriptionId: args.stripeSubscriptionId,
         status: args.status,
         currentPeriodEnd: args.currentPeriodEnd,
+        cancelAtPeriodEnd: args.cancelAtPeriodEnd,
       });
     } catch (err) {
       // Subscription may not exist yet if this fires before checkout.session.completed

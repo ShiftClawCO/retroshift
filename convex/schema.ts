@@ -57,6 +57,7 @@ export default defineSchema({
     stripePriceId: v.string(),
     status: v.string(), // "active", "past_due", "canceled", etc.
     currentPeriodEnd: v.number(),
+    cancelAtPeriodEnd: v.optional(v.boolean()), // true if set to cancel at period end
     createdAt: v.number(),
     updatedAt: v.number(),
   })

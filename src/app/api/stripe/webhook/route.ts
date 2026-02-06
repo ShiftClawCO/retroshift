@@ -48,15 +48,16 @@ export async function POST(req: Request) {
 
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
-      
+
       // Update plan based on status
       const plan = subscription.status === "active" ? "pro" : "free";
-      
+
       // Use Convex action that calls internal mutations
       await convex.action(api.stripe.handleSubscriptionUpdated, {
         stripeSubscriptionId: subscription.id,
         status: subscription.status,
-        currentPeriodEnd: (subscription as any).current_period_end * 1000,
+        currentPeriodEnd: (subscription as unknown as { current_period_end: number }).current_period_end * 1000,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
         stripeCustomerId: subscription.customer as string,
         plan,
       });

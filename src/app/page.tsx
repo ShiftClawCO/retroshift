@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 import {
   Rocket,
   VolumeX,
@@ -338,11 +339,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 text-center text-muted-foreground text-sm border-t">
-        <div className="container mx-auto px-4">
-          <p>{t('home.footer')} <a href="https://shiftclaw.com" className="text-foreground hover:underline">Shiftclaw</a></p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

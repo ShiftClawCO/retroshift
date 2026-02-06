@@ -244,5 +244,49 @@
   },
   "myRetros": {
     "upgradeSuccess": "Welcome to Pro! You now have unlimited retros, participants, and all premium features."
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Insights on async retrospectives, team feedback, and remote collaboration.",
+    "readMore": "Read more",
+    "readTime": "{minutes} min read",
+    "backToBlog": "Back to blog",
+    "noPosts": "No blog posts yet. Check back soon!"
+  },
+  "footer": {
+    "madeWith": "Made with 🦞 by",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact",
+    "blog": "Blog"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "profileDesc": "Your account information",
+    "subscription": "Subscription",
+    "subscriptionDesc": "Manage your subscription and billing",
+    "currentPlan": "Current plan",
+    "freePlan": "Free Plan",
+    "proPlan": "Pro Plan",
+    "renewsOn": "Renews on {date}",
+    "cancelsOn": "Cancels on {date}",
+    "proFeatures": "Your Pro features:",
+    "managePayment": "Manage payment method",
+    "cancelSubscription": "Cancel subscription",
+    "upgradeToPro": "Upgrade to Pro",
+    "signInRequired": "Sign in required",
+    "signInRequiredDesc": "You need to be signed in to access settings.",
+    "cancelDialogTitle": "Cancel your subscription?",
+    "cancelDialogDesc": "Are you sure you want to cancel your Pro subscription? Here's what will happen:",
+    "cancelDialogPoint1": "You'll keep Pro access until the end of your billing period",
+    "cancelDialogPoint2": "Your data will be retained (retros, feedback, history)",
+    "cancelDialogPoint3": "You can resubscribe anytime to regain Pro features",
+    "keepSubscription": "Keep subscription",
+    "confirmCancel": "Yes, cancel",
+    "canceling": "Canceling...",
+    "cancelSuccess": "Subscription canceled",
+    "cancelSuccessDesc": "Your Pro access will end on {date}. You can resubscribe anytime.",
+    "cancelError": "Failed to cancel"
   }
 }
